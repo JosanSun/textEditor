@@ -14,6 +14,16 @@
 
 关于具体的TextEditor的运行界面，可以看running-pics文件夹！
 
+### 一览
+
+![主界面](https://github.com/JosanSun/textEditor/blob/master/running-pics/mainInterface.png  "主界面")
+主界面
+
+![打开文件界面](https://github.com/JosanSun/textEditor/blob/master/running-pics/openAFile.png  "打开文件")
+
+![about](https://github.com/JosanSun/textEditor/blob/master/running-pics/about.png "about窗口")
+关于窗口
+
 现在已经完成TextEditor主体框架的搭建，但是具体菜单项的信号与槽的连接，还在进一步完善当中.
 
 待完善：
