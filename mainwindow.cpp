@@ -45,14 +45,16 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    QMessageBox::StandardButton ret;
-    ret = QMessageBox::warning(this, tr("Save Changes"),
-                               tr("The document has been modified.<br>"
-                                  "Do you want to save your changes?"),
-                               QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+    if(textIsModified){
+        QMessageBox::StandardButton ret;
+        ret = QMessageBox::warning(this, tr("Save Changes"),
+                                   tr("The document has been modified.<br>"
+                                      "Do you want to save your changes?"),
+                                   QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
 
-    if (ret == QMessageBox::Save)
-        save();
+        if (ret == QMessageBox::Save)
+            save();
+    }
     if(okToContinue())
     {
         event->accept();
@@ -91,6 +93,7 @@ void MainWindow::open()
 
 bool MainWindow::save()
 {
+    textUnmodified();
     if(curFile.isEmpty())
     {
         return saveAs();
@@ -100,7 +103,7 @@ bool MainWindow::save()
         return saveFile(curFile);
     }
 
-    textUnmodified();
+
 }
 
 bool MainWindow::saveAs()
