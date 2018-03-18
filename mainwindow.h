@@ -35,6 +35,9 @@ private slots:
     void find();
     void about();
 
+    void textModified();
+    //void textUnmodified();
+
 private:
     void createActions();
     void createMenus();
@@ -51,6 +54,7 @@ private:
     QString curFile;
     TextEditor* textEdit;
     QLabel* showLabel;
+    bool textIsModified;
 
     // 菜单项
     QMenu* fileMenu;
@@ -88,6 +92,8 @@ private:
 
     QAction* updateAction;
     QAction* aboutAction;
+
+    void textUnmodified();
 };
 
 #endif // MainWindow_H

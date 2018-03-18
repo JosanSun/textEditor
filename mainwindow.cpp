@@ -1,4 +1,4 @@
-#include <QAction>
+﻿#include <QAction>
 #include <QLabel>
 #include <QMenu>
 #include <QMenuBar>
@@ -10,6 +10,11 @@
 #include <QFileDialog>
 #include <QCloseEvent>
 
+#ifdef _MSC_VER
+#if _MSC_VER >= 1600
+#pragma execution_character_set("utf-8")
+#endif
+#endif
 
 #include "mainwindow.h"
 
@@ -28,6 +33,9 @@ MainWindow::MainWindow(QWidget *parent)
     setWindowIcon(QIcon(":/images/fileIcon.png"));
     this->setCurrentFile("");
     this->resize(500, 300);
+
+    textIsModified = false;
+    connect(textEdit, SIGNAL(textChanged()), this, SLOT(textModified()));
 }
 
 MainWindow::~MainWindow()
@@ -53,6 +61,7 @@ void MainWindow::newFile()
     {
         textEdit->clear();
         setCurrentFile("");
+        textUnmodified();
     }
 }
 
@@ -67,6 +76,7 @@ void MainWindow::open()
         if(!fileName.isEmpty())
         {
             loadFile(fileName);
+            textUnmodified();
         }
     }
 }
@@ -81,6 +91,8 @@ bool MainWindow::save()
     {
         return saveFile(curFile);
     }
+
+    textUnmodified();
 }
 
 bool MainWindow::saveAs()
@@ -371,7 +383,33 @@ QString MainWindow::strippedName(const QString &fileName)
     return QFileInfo(fileName).fileName();
 }
 
+void MainWindow::textModified()
+{
+    textIsModified = true;
+    QString shownName = tr("new");
+    if(!curFile.isEmpty())
+    {
+        curFile.replace('/', '\\');
+        shownName = curFile;
+    }
+    setWindowTitle(tr("*%1[*] - %2")
+                   .arg(shownName)
+                   .arg(tr("TextEditor")));
+}
 
+void MainWindow::textUnmodified()
+{
+    textIsModified = false;
+    QString shownName = tr("new");
+    if(!curFile.isEmpty())
+    {
+        curFile.replace('/', '\\');
+        shownName = curFile;
+    }
+    setWindowTitle(tr("%1[*] - %2")
+                   .arg(shownName)
+                   .arg(tr("TextEditor")));
+}
 
 
 
