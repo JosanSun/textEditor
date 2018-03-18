@@ -21,9 +21,15 @@
 
 2. 对于改动后的文本，显示的文件名应该带有[*].
 
+## 讨论群
+
+对TextEditor的完善工作感兴趣的，可以加QQ群:**676908519**.备注:Text.
+
 ## 参考资料
 
 1. [C++ GUI Programming with QT 4](http://www-cs.ccny.cuny.edu/~wolberg/cs221/qt/books/C++-GUI-Programming-with-Qt-4-1st-ed.pdf )
 
 程序的主体代码是仿照第三章和第四章的`spreadsheet`以及第六章的`mdieditor`。
+
+
 
