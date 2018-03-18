@@ -1,0 +1,6 @@
+# ignore user files
+*.user
+
+# 忽略生成的中间文件
+
+**build**
