@@ -288,7 +288,7 @@ void MainWindow::createToolBars()
     editToolBar->addAction(pasteAction);
     editToolBar->addSeparator();
     // 如果有icon的话，显示图标；否则显示文字
-    editToolBar->addAction(selectAllAction);
+    //editToolBar->addAction(selectAllAction);
 }
 
 void MainWindow::createStatusBar()
