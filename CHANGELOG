@@ -1,13 +1,17 @@
 # Change Log
 # All notable changes to this project will be documented in this file.
 
+## [2.1] 2018-03-19
+### Added
+- 增加对MD5校验的支持.[@scienceasdf更新]
+
 ## [2.0] 2018-03-19
 ### Added
 - 增加对最近打开文件记录的支持.
 
 ## [1.1] 2018-03-19
 ### Added
-- 增加对MSVC版本字符编码的支持.  
+- 增加对MSVC版本字符编码的支持.  [@scienceasdf更新]
 ### Changed
 - 将窗口标题的星号位置置前.`C:\test\test.txt* -- TextEditor`改为`*C:\test\test.txt -- TextEditor`  
 ### Fixed
@@ -20,25 +24,3 @@
 - 将窗口标题显示`C:/test/test.txt`改为与Notepad++类似的`C:\test\test.txt`.  
 ### Added  
 - TextEditor的整体框架搭建完成  
-
-
-
-
-
-
-
-
----------------------------------------
-EXAMPLES:
-### Added
-- Introduce a new option of formatting multiline literals. Add
-  `SPLIT_BEFORE_CLOSING_BRACKET` knob to control whether closing bracket should
-  get their own line.
-### Changed
-- Improve the speed at which files are excluded by ignoring them earlier.
-- Allow dictionaries to stay on a single line if they only have one entry
-### Fixed
-- Use tabs when constructing a continuation line when `USE_TABS` is enabled.
-- A dictionary entry may not end in a colon, but may be an "unpacking"
-  operation: `**foo`. Take that into accound and don't split after the
-  unpacking operator.
