@@ -7,7 +7,7 @@
 
 TextEditor::TextEditor(QWidget* parent):QTextEdit(parent)
 {
-
+    connect(this, &TextEditor::textChanged, this, &TextEditor::textEditorChanged);
 
     clear();
 }
@@ -48,4 +48,9 @@ bool TextEditor::writeFile(const QString &fileName)
     out << this -> toPlainText();
     QApplication::restoreOverrideCursor();
     return true;
+}
+
+void TextEditor::textEditorChanged()
+{
+    emit modifiedTextEditor();
 }

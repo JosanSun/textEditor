@@ -34,8 +34,9 @@ MainWindow::MainWindow(QWidget *parent)
     this->setCurrentFile("");
     this->resize(500, 300);
 
-    textIsModified = false;
-    connect(textEdit, SIGNAL(textChanged()), this, SLOT(textModified()));
+    connect(textEdit, &TextEditor::modifiedTextEditor,
+            this, &MainWindow::textEditorModified);
+
 }
 
 MainWindow::~MainWindow()
@@ -45,16 +46,16 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    if(textIsModified){
-        QMessageBox::StandardButton ret;
-        ret = QMessageBox::warning(this, tr("Save Changes"),
-                                   tr("The document has been modified.<br>"
-                                      "Do you want to save your changes?"),
-                                   QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+//    if(textIsModified){
+//        QMessageBox::StandardButton ret;
+//        ret = QMessageBox::warning(this, tr("Save Changes"),
+//                                   tr("The document has been modified.<br>"
+//                                      "Do you want to save your changes?"),
+//                                   QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
 
-        if (ret == QMessageBox::Save)
-            save();
-    }
+//        if (ret == QMessageBox::Save)
+//            save();
+//    }
     if(okToContinue())
     {
         event->accept();
@@ -71,7 +72,7 @@ void MainWindow::newFile()
     {
         textEdit->clear();
         setCurrentFile("");
-        textUnmodified();
+        //textUnmodified();
     }
 }
 
@@ -86,14 +87,14 @@ void MainWindow::open()
         if(!fileName.isEmpty())
         {
             loadFile(fileName);
-            textUnmodified();
+            //textUnmodified();
         }
     }
 }
 
 bool MainWindow::save()
 {
-    textUnmodified();
+    //textUnmodified();
     if(curFile.isEmpty())
     {
         return saveAs();
@@ -157,6 +158,11 @@ void MainWindow::about()
                "<p>MainWindow是一个用来展示QAction, QMainWindow, QMenuBar, "
                "QStatusBar, QTableWidget, QToolBar以及其他Qt类用法"
                "<p>本软件仅用来交流讨论，有任何好的建议欢迎联系QQ:1030460698。"));
+}
+
+void MainWindow::textEditorModified()
+{
+    setWindowModified(true);
 }
 
 void MainWindow::createActions()
@@ -345,7 +351,7 @@ bool MainWindow::okToContinue()
 {
     if(isWindowModified())
     {
-        int res = QMessageBox::warning(this, tr("MainWindow"),
+        int res = QMessageBox::warning(this, tr("TextEditor"),
                                        tr("The text has been modified.\n"
                                           "Do you want to save your changes?"),
                                        QMessageBox::Yes | QMessageBox::No
@@ -394,33 +400,33 @@ QString MainWindow::strippedName(const QString &fileName)
     return QFileInfo(fileName).fileName();
 }
 
-void MainWindow::textModified()
-{
-    textIsModified = true;
-    QString shownName = tr("new");
-    if(!curFile.isEmpty())
-    {
-        curFile.replace('/', '\\');
-        shownName = curFile;
-    }
-    setWindowTitle(tr("*%1[*] - %2")
-                   .arg(shownName)
-                   .arg(tr("TextEditor")));
-}
+//void MainWindow::textModified()
+//{
+//    textIsModified = true;
+//    QString shownName = tr("new");
+//    if(!curFile.isEmpty())
+//    {
+//        curFile.replace('/', '\\');
+//        shownName = curFile;
+//    }
+//    setWindowTitle(tr("*%1[*] - %2")
+//                   .arg(shownName)
+//                   .arg(tr("TextEditor")));
+//}
 
-void MainWindow::textUnmodified()
-{
-    textIsModified = false;
-    QString shownName = tr("new");
-    if(!curFile.isEmpty())
-    {
-        curFile.replace('/', '\\');
-        shownName = curFile;
-    }
-    setWindowTitle(tr("%1[*] - %2")
-                   .arg(shownName)
-                   .arg(tr("TextEditor")));
-}
+//void MainWindow::textUnmodified()
+//{
+//    textIsModified = false;
+//    QString shownName = tr("new");
+//    if(!curFile.isEmpty())
+//    {
+//        curFile.replace('/', '\\');
+//        shownName = curFile;
+//    }
+//    setWindowTitle(tr("%1[*] - %2")
+//                   .arg(shownName)
+//                   .arg(tr("TextEditor")));
+//}
 
 
 
