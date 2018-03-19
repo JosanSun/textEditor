@@ -9,6 +9,8 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QCloseEvent>
+#include <QSettings>
+#include <QStringList>
 
 #ifdef _MSC_VER
 #if _MSC_VER >= 1600
@@ -17,7 +19,6 @@
 #endif
 
 #include "mainwindow.h"
-#include "md5widget.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -25,15 +26,23 @@ MainWindow::MainWindow(QWidget *parent)
     textEdit = new TextEditor(this);
     this->setCentralWidget(textEdit);
 
+    // 创建主界面
     createActions();
     createMenus();
     createContextMenu();
     createToolBars();
     createStatusBar();
 
+    // 读取配置
+    readSettings();
+
     setWindowIcon(QIcon(":/images/fileIcon.png"));
     this->setCurrentFile("");
     this->resize(500, 300);
+
+    connect(textEdit, &TextEditor::modifiedTextEditor,
+            this, &MainWindow::textEditorModified);
+
 }
 
 MainWindow::~MainWindow()
@@ -43,9 +52,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-
     if(okToContinue())
     {
+        writeSettings();
         event->accept();
     }
     else
@@ -107,7 +116,6 @@ void MainWindow::find()
 
 }
 
-
 void MainWindow::cut()
 {
 
@@ -143,6 +151,22 @@ void MainWindow::about()
                "<p>本软件仅用来交流讨论，有任何好的建议欢迎联系QQ:1030460698。"));
 }
 
+void MainWindow::textEditorModified()
+{
+    setWindowModified(true);
+}
+
+void MainWindow::openRecentFile()
+{
+    if(okToContinue())
+    {
+        QAction* action = qobject_cast<QAction *>(sender());
+        if(action)
+        {
+            loadFile(action->data().toString());
+        }
+    }
+}
 
 void MainWindow::createActions()
 {
@@ -171,6 +195,15 @@ void MainWindow::createActions()
     saveAsAction->setStatusTip(tr("将文件另存为..."));
     connect(saveAsAction, &QAction::triggered,
             this, &MainWindow::saveAs);
+
+    // 文件菜单 --> 最近打开文件
+    for(int i = 0; i < MaxRecentFiles; ++i)
+    {
+        recentFileActions[i] = new QAction(this);
+        recentFileActions[i]->setVisible(false);
+        connect(recentFileActions[i], &QAction::triggered,
+                this, &MainWindow::openRecentFile);
+    }
 
     exitAction = new QAction(tr("关闭"), this);
     exitAction->setShortcut(tr("Ctrl+Q"));
@@ -222,16 +255,15 @@ void MainWindow::createActions()
 
     md5Action = new QAction(tr("MD5"), this);
     md5Action->setStatusTip(tr("MD5校验"));
+    connect(md5Action, &QAction::triggered, this, &MainWindow::MD5WidgetShow);
 
-    updateAction = new QAction(tr("升级 TextEditor"), this);
+    updateAction = new QAction(tr("升级 MainWindow"), this);
     updateAction->setStatusTip(tr("升级应用程序"));
 
-    aboutAction = new QAction(tr("关于 TextEditor..."), this);
+    aboutAction = new QAction(tr("关于 MainWindow..."), this);
     aboutAction->setStatusTip(tr("显示应用的相关信息"));
     connect(aboutAction, &QAction::triggered,
             this, &MainWindow::about);
-    connect(md5Action, &QAction::triggered,
-            this, &MainWindow::MD5WidgetShow);
 }
 
 void MainWindow::createMenus()
@@ -242,7 +274,11 @@ void MainWindow::createMenus()
     fileMenu->addAction(openAction);
     fileMenu->addAction(saveAction);
     fileMenu->addAction(saveAsAction);
-
+    separatorAction = fileMenu->addSeparator();
+    for(int i = 0; i < MaxRecentFiles; ++i)
+    {
+        fileMenu->addAction(recentFileActions[i]);
+    }
     fileMenu->addSeparator();
     fileMenu->addAction(exitAction);
 
@@ -296,8 +332,6 @@ void MainWindow::createToolBars()
     editToolBar->addAction(copyAction);
     editToolBar->addAction(pasteAction);
     editToolBar->addSeparator();
-    // 如果有icon的话，显示图标；否则显示文字
-    //editToolBar->addAction(selectAllAction);
 }
 
 void MainWindow::createStatusBar()
@@ -320,12 +354,30 @@ void MainWindow::setCurrentFile(const QString &fileName)
     {
         curFile.replace('/', '\\');
         shownName = curFile;
+        recentFiles.removeAll(curFile);
+        recentFiles.prepend(curFile);   // 头插
+        updateRecentFileActions();
     }
 
     // 更简单的方法改变默认星号的位置 [*]可以解析 [#或者其他字符]无法解析
     setWindowTitle(tr("[*]%1 - %2")
                    .arg(shownName)
                    .arg(tr("TextEditor")));
+}
+
+void MainWindow::readSettings()
+{
+    QSettings settings("SouthEast University", "TextEditor");
+
+    recentFiles = settings.value("recentFiles").toStringList();
+    updateRecentFileActions();
+}
+
+void MainWindow::writeSettings()
+{
+    QSettings settings("SouthEast University", "TextEditor");
+
+    settings.setValue("recentFiles", recentFiles);
 }
 
 bool MainWindow::okToContinue()
@@ -375,20 +427,49 @@ bool MainWindow::saveFile(const QString &fileName)
     return true;
 }
 
+void MainWindow::updateRecentFileActions()
+{
+    QMutableStringListIterator i(recentFiles);
+    while(i.hasNext())
+    {
+        if(!QFile::exists(i.next()))
+        {
+            i.remove();
+        }
+    }
+
+    for(int j = 0; j < MaxRecentFiles; ++j)
+    {
+        if(j < recentFiles.count())
+        {
+            QString text = tr("%1: %2")
+                    .arg(j + 1)
+                    .arg(recentFiles[j]);
+            recentFileActions[j]->setText(text);
+            recentFileActions[j]->setData(recentFiles[j]);
+            recentFileActions[j]->setVisible(true);
+        }
+        else
+        {
+            recentFileActions[j]->setVisible(false);
+        }
+    }
+    separatorAction->setVisible(!recentFiles.isEmpty());
+
+}
+
 // 取文件名  eg:C:/test/test.txt  --->  test.txt
 QString MainWindow::strippedName(const QString &fileName)
 {
     return QFileInfo(fileName).fileName();
 }
 
+
 void MainWindow::MD5WidgetShow()
 {
     MD5Widget* md5widget = new MD5Widget;
     md5widget->show();
 }
-
-
-
 
 
 

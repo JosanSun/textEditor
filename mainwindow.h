@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "texteditor.h"
+#include "md5widget.h"
 
 class QAction;
 class QLabel;
@@ -22,6 +23,21 @@ public:
 protected:
     void closeEvent(QCloseEvent* event);
 
+private:
+    void createActions();
+    void createMenus();
+    void createContextMenu();
+    void createToolBars();
+    void createStatusBar();
+    void readSettings();
+    void writeSettings();
+    bool okToContinue();
+    void setCurrentFile(const QString& fileName);
+    bool loadFile(const QString& fileName);
+    bool saveFile(const QString& fileName);
+    void updateRecentFileActions();
+    QString strippedName(const QString& fileName);
+
 private slots:
     void newFile();
     void open();
@@ -34,25 +50,16 @@ private slots:
     void selectAll();
     void find();
     void about();
+    void textEditorModified();
+    void openRecentFile();
     void MD5WidgetShow();
 
 private:
-    void createActions();
-    void createMenus();
-    void createContextMenu();
-    void createToolBars();
-    void createStatusBar();
-    bool okToContinue();
-    void setCurrentFile(const QString& fileName);
-    bool loadFile(const QString& fileName);
-    bool saveFile(const QString& fileName);
-    QString strippedName(const QString& fileName);
-
     // 当前文件名
-    QString curFile;
+    QString curFile;            // 带有路径的文件名 eg：
+    QStringList recentFiles;
     TextEditor* textEdit;
     QLabel* showLabel;
-    //bool textIsModified;
 
     // 菜单项
     QMenu* fileMenu;
@@ -72,26 +79,21 @@ private:
     QAction* openAction;
     QAction* saveAction;
     QAction* saveAsAction;
+    enum{ MaxRecentFiles = 5 };
+    QAction* recentFileActions[MaxRecentFiles];
+    QAction* separatorAction;        // 用于最近打开文件菜单项的分隔
     QAction* exitAction;
-
     QAction* cutAction;
     QAction* copyAction;
     QAction* pasteAction;
     QAction* deleteAction;
     QAction* selectAllAction;
-
     QAction* findAction;
-
     QAction* fullScreenAction;
-
     QAction* optionAction;
-
     QAction* md5Action;
-
     QAction* updateAction;
     QAction* aboutAction;
-
-    //void textUnmodified();
 };
 
 #endif // MainWindow_H
