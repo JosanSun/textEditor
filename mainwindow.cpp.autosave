@@ -282,12 +282,10 @@ void MainWindow::createMenus()
     fileMenu->addAction(saveAction);
     fileMenu->addAction(saveAsAction);
     fileMenu->addSeparator();
-
     for(int i = 0; i < MaxRecentFiles; ++i)
     {
         fileMenu->addAction(recentFileActions[i]);
     }
-
     fileMenu->addSeparator();
     fileMenu->addAction(exitAction);
 

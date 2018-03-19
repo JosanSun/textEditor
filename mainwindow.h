@@ -35,6 +35,7 @@ private slots:
     void find();
     void about();
     void textEditorModified();
+    void openRecentFile();
 
 private:
     void createActions();
@@ -46,6 +47,7 @@ private:
     void setCurrentFile(const QString& fileName);
     bool loadFile(const QString& fileName);
     bool saveFile(const QString& fileName);
+    void updateRecentFileActions();
     QString strippedName(const QString& fileName);
 
     // 当前文件名
@@ -72,6 +74,8 @@ private:
     QAction* openAction;
     QAction* saveAction;
     QAction* saveAsAction;
+    enum{ MaxRecentFiles = 5 };
+    QAction* recentFileActions[MaxRecentFiles];
     QAction* exitAction;
 
     QAction* cutAction;

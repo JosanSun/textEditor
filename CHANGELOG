@@ -1,0 +1,41 @@
+# Change Log
+# All notable changes to this project will be documented in this file.
+
+
+## [1.1] 2018-03-19
+### Added
+- 增加对MSVC版本字符编码的支持.  
+### Changed
+- 将窗口标题的星号位置置前.`C:\test\test.txt* -- TextEditor`改为`*C:\test\test.txt -- TextEditor`  
+### Fixed
+- 修正了程序退出时, 无法正常存储的问题!   
+- 对`closeEvent(QCloseEvent*)`进行改进.增加自定义`TextEditor`类的`modifiedTextEditor`信号,  
+  配合处理退出问题
+ 
+## [1.0] 2018-03-18  
+### Changed  
+- 将窗口标题显示`C:/test/test.txt`改为与Notepad++类似的`C:\test\test.txt`.  
+### Added  
+- TextEditor的整体框架搭建完成  
+
+
+
+
+
+
+
+
+---------------------------------------
+EXAMPLES:
+### Added
+- Introduce a new option of formatting multiline literals. Add
+  `SPLIT_BEFORE_CLOSING_BRACKET` knob to control whether closing bracket should
+  get their own line.
+### Changed
+- Improve the speed at which files are excluded by ignoring them earlier.
+- Allow dictionaries to stay on a single line if they only have one entry
+### Fixed
+- Use tabs when constructing a continuation line when `USE_TABS` is enabled.
+- A dictionary entry may not end in a colon, but may be an "unpacking"
+  operation: `**foo`. Take that into accound and don't split after the
+  unpacking operator.
