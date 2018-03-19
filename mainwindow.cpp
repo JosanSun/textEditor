@@ -255,6 +255,7 @@ void MainWindow::createActions()
 
     md5Action = new QAction(tr("MD5"), this);
     md5Action->setStatusTip(tr("MD5校验"));
+    connect(md5Action, &QAction::triggered, this, &MainWindow::MD5WidgetShow);
 
     updateAction = new QAction(tr("升级 TextEditor"), this);
     updateAction->setStatusTip(tr("升级应用程序"));
@@ -454,17 +455,14 @@ void MainWindow::updateRecentFileActions()
         }
     }
     separatorAction->setVisible(!recentFiles.isEmpty());
-
 }
 
-// 取文件名  eg:C:/test/test.txt  --->  test.txt
-QString MainWindow::strippedName(const QString &fileName)
+
+void MainWindow::MD5WidgetShow()
 {
-    return QFileInfo(fileName).fileName();
+    MD5Widget* md5widget = new MD5Widget;
+    md5widget->show();
 }
-
-
-
 
 
 

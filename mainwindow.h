@@ -1,8 +1,10 @@
-#ifndef MainWindow_H
+﻿#ifndef MainWindow_H
 #define MainWindow_H
 
 #include <QMainWindow>
 #include "texteditor.h"
+#include "md5widget.h"
+
 
 class QAction;
 class QLabel;
@@ -51,10 +53,12 @@ private slots:
     void about();
     void textEditorModified();
     void openRecentFile();
+    void MD5WidgetShow();
+
 
 private:
     // 当前文件名
-    QString curFile;            // 带有路径的文件名 eg：
+    QString curFile;            // 带有路径的文件名 eg：C:\test\test.txt
     QStringList recentFiles;
     TextEditor* textEdit;
     QLabel* showLabel;
