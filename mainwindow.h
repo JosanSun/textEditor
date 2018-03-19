@@ -34,7 +34,6 @@ private slots:
     void selectAll();
     void find();
     void about();
-    void textEditorModified();
     void MD5WidgetShow();
 
 private:

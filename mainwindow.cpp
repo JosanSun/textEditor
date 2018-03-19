@@ -34,10 +34,6 @@ MainWindow::MainWindow(QWidget *parent)
     setWindowIcon(QIcon(":/images/fileIcon.png"));
     this->setCurrentFile("");
     this->resize(500, 300);
-
-    connect(textEdit, &TextEditor::modifiedTextEditor,
-            this, &MainWindow::textEditorModified);
-
 }
 
 MainWindow::~MainWindow()
@@ -47,16 +43,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-//    if(textIsModified){
-//        QMessageBox::StandardButton ret;
-//        ret = QMessageBox::warning(this, tr("Save Changes"),
-//                                   tr("The document has been modified.<br>"
-//                                      "Do you want to save your changes?"),
-//                                   QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
 
-//        if (ret == QMessageBox::Save)
-//            save();
-//    }
     if(okToContinue())
     {
         event->accept();
@@ -73,7 +60,6 @@ void MainWindow::newFile()
     {
         textEdit->clear();
         setCurrentFile("");
-        //textUnmodified();
     }
 }
 
@@ -157,25 +143,6 @@ void MainWindow::about()
                "<p>本软件仅用来交流讨论，有任何好的建议欢迎联系QQ:1030460698。"));
 }
 
-void MainWindow::textEditorModified()
-{
-    setWindowModified(true);
-
-    // 这个方法虽然也能修改星号的位置，但是没有setCurrentFile()中的方法简单
-    // 修改*的位置
-    // eg:  C:/test/test.txt* -- Editor
-    // -->  *C:/test/test.txt -- Editor
-//    QString shownTitle = this->windowTitle();
-//    if(shownTitle.contains('*'))
-//    {
-//        if(shownTitle.contains("[*]"))
-//        {
-//            shownTitle.remove("[*]");
-//            shownTitle.push_front('*');
-//        }
-//        setWindowTitle(shownTitle);
-//    }
-}
 
 void MainWindow::createActions()
 {
@@ -356,9 +323,6 @@ void MainWindow::setCurrentFile(const QString &fileName)
     }
 
     // 更简单的方法改变默认星号的位置 [*]可以解析 [#或者其他字符]无法解析
-//    setWindowTitle(tr("%1[*] - %2")
-//                   .arg(shownName)
-//                   .arg(tr("TextEditor")));
     setWindowTitle(tr("[*]%1 - %2")
                    .arg(shownName)
                    .arg(tr("TextEditor")));
@@ -422,34 +386,6 @@ void MainWindow::MD5WidgetShow()
     MD5Widget* md5widget = new MD5Widget;
     md5widget->show();
 }
-
-//void MainWindow::textModified()
-//{
-//    textIsModified = true;
-//    QString shownName = tr("new");
-//    if(!curFile.isEmpty())
-//    {
-//        curFile.replace('/', '\\');
-//        shownName = curFile;
-//    }
-//    setWindowTitle(tr("*%1[*] - %2")
-//                   .arg(shownName)
-//                   .arg(tr("TextEditor")));
-//}
-
-//void MainWindow::textUnmodified()
-//{
-//    textIsModified = false;
-//    QString shownName = tr("new");
-//    if(!curFile.isEmpty())
-//    {
-//        curFile.replace('/', '\\');
-//        shownName = curFile;
-//    }
-//    setWindowTitle(tr("%1[*] - %2")
-//                   .arg(shownName)
-//                   .arg(tr("TextEditor")));
-//}
 
 
 
