@@ -9,6 +9,8 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QCloseEvent>
+#include <QSettings>
+#include <QStringList>
 
 #ifdef _MSC_VER
 #if _MSC_VER >= 1600
@@ -24,11 +26,15 @@ MainWindow::MainWindow(QWidget *parent)
     textEdit = new TextEditor(this);
     this->setCentralWidget(textEdit);
 
+    // 创建主界面
     createActions();
     createMenus();
     createContextMenu();
     createToolBars();
     createStatusBar();
+
+    // 读取配置
+    readSettings();
 
     setWindowIcon(QIcon(":/images/fileIcon.png"));
     this->setCurrentFile("");
@@ -46,18 +52,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-//    if(textIsModified){
-//        QMessageBox::StandardButton ret;
-//        ret = QMessageBox::warning(this, tr("Save Changes"),
-//                                   tr("The document has been modified.<br>"
-//                                      "Do you want to save your changes?"),
-//                                   QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
-
-//        if (ret == QMessageBox::Save)
-//            save();
-//    }
     if(okToContinue())
     {
+        writeSettings();
         event->accept();
     }
     else
@@ -72,7 +69,6 @@ void MainWindow::newFile()
     {
         textEdit->clear();
         setCurrentFile("");
-        //textUnmodified();
     }
 }
 
@@ -120,7 +116,6 @@ void MainWindow::find()
 
 }
 
-
 void MainWindow::cut()
 {
 
@@ -159,21 +154,18 @@ void MainWindow::about()
 void MainWindow::textEditorModified()
 {
     setWindowModified(true);
+}
 
-    // 这个方法虽然也能修改星号的位置，但是没有setCurrentFile()中的方法简单
-    // 修改*的位置
-    // eg:  C:/test/test.txt* -- Editor
-    // -->  *C:/test/test.txt -- Editor
-//    QString shownTitle = this->windowTitle();
-//    if(shownTitle.contains('*'))
-//    {
-//        if(shownTitle.contains("[*]"))
-//        {
-//            shownTitle.remove("[*]");
-//            shownTitle.push_front('*');
-//        }
-//        setWindowTitle(shownTitle);
-//    }
+void MainWindow::openRecentFile()
+{
+    if(okToContinue())
+    {
+        QAction* action = qobject_cast<QAction *>(sender());
+        if(action)
+        {
+            loadFile(action->data().toString());
+        }
+    }
 }
 
 void MainWindow::createActions()
@@ -281,13 +273,11 @@ void MainWindow::createMenus()
     fileMenu->addAction(openAction);
     fileMenu->addAction(saveAction);
     fileMenu->addAction(saveAsAction);
-    fileMenu->addSeparator();
-
+    separatorAction = fileMenu->addSeparator();
     for(int i = 0; i < MaxRecentFiles; ++i)
     {
         fileMenu->addAction(recentFileActions[i]);
     }
-
     fileMenu->addSeparator();
     fileMenu->addAction(exitAction);
 
@@ -341,8 +331,6 @@ void MainWindow::createToolBars()
     editToolBar->addAction(copyAction);
     editToolBar->addAction(pasteAction);
     editToolBar->addSeparator();
-    // 如果有icon的话，显示图标；否则显示文字
-    //editToolBar->addAction(selectAllAction);
 }
 
 void MainWindow::createStatusBar()
@@ -365,15 +353,30 @@ void MainWindow::setCurrentFile(const QString &fileName)
     {
         curFile.replace('/', '\\');
         shownName = curFile;
+        recentFiles.removeAll(curFile);
+        recentFiles.prepend(curFile);   // 头插
+        updateRecentFileActions();
     }
 
     // 更简单的方法改变默认星号的位置 [*]可以解析 [#或者其他字符]无法解析
-//    setWindowTitle(tr("%1[*] - %2")
-//                   .arg(shownName)
-//                   .arg(tr("TextEditor")));
     setWindowTitle(tr("[*]%1 - %2")
                    .arg(shownName)
                    .arg(tr("TextEditor")));
+}
+
+void MainWindow::readSettings()
+{
+    QSettings settings("SouthEast University", "TextEditor");
+
+    recentFiles = settings.value("recentFiles").toStringList();
+    updateRecentFileActions();
+}
+
+void MainWindow::writeSettings()
+{
+    QSettings settings("SouthEast University", "TextEditor");
+
+    settings.setValue("recentFiles", recentFiles);
 }
 
 bool MainWindow::okToContinue()
@@ -423,39 +426,42 @@ bool MainWindow::saveFile(const QString &fileName)
     return true;
 }
 
+void MainWindow::updateRecentFileActions()
+{
+    QMutableStringListIterator i(recentFiles);
+    while(i.hasNext())
+    {
+        if(!QFile::exists(i.next()))
+        {
+            i.remove();
+        }
+    }
+
+    for(int j = 0; j < MaxRecentFiles; ++j)
+    {
+        if(j < recentFiles.count())
+        {
+            QString text = tr("%1: %2")
+                    .arg(j + 1)
+                    .arg(recentFiles[j]);
+            recentFileActions[j]->setText(text);
+            recentFileActions[j]->setData(recentFiles[j]);
+            recentFileActions[j]->setVisible(true);
+        }
+        else
+        {
+            recentFileActions[j]->setVisible(false);
+        }
+    }
+    separatorAction->setVisible(!recentFiles.isEmpty());
+
+}
+
 // 取文件名  eg:C:/test/test.txt  --->  test.txt
 QString MainWindow::strippedName(const QString &fileName)
 {
     return QFileInfo(fileName).fileName();
 }
-
-//void MainWindow::textModified()
-//{
-//    textIsModified = true;
-//    QString shownName = tr("new");
-//    if(!curFile.isEmpty())
-//    {
-//        curFile.replace('/', '\\');
-//        shownName = curFile;
-//    }
-//    setWindowTitle(tr("*%1[*] - %2")
-//                   .arg(shownName)
-//                   .arg(tr("TextEditor")));
-//}
-
-//void MainWindow::textUnmodified()
-//{
-//    textIsModified = false;
-//    QString shownName = tr("new");
-//    if(!curFile.isEmpty())
-//    {
-//        curFile.replace('/', '\\');
-//        shownName = curFile;
-//    }
-//    setWindowTitle(tr("%1[*] - %2")
-//                   .arg(shownName)
-//                   .arg(tr("TextEditor")));
-//}
 
 
 
