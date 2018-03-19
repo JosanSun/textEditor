@@ -1,6 +1,9 @@
 # Change Log
 # All notable changes to this project will be documented in this file.
 
+## [2.0] 2018-03-19
+### Added
+- 增加对最近打开文件记录的支持.
 
 ## [1.1] 2018-03-19
 ### Added

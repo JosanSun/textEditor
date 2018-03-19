@@ -144,7 +144,7 @@ void MainWindow::selectAll()
 void MainWindow::about()
 {
     QMessageBox::about(this, tr("关于 TextEditor"),
-            tr("<h2>TextEditor 1.0</h2>"
+            tr("<h2>TextEditor 2.0</h2>"
                "<p>Copyright &copy; 2018 SouthEast University."
                "<p>TextEditor是一个用来展示QAction, QMainWindow, QMenuBar, "
                "QStatusBar, QTableWidget, QToolBar以及其他Qt类用法"
@@ -256,10 +256,10 @@ void MainWindow::createActions()
     md5Action = new QAction(tr("MD5"), this);
     md5Action->setStatusTip(tr("MD5校验"));
 
-    updateAction = new QAction(tr("升级 MainWindow"), this);
+    updateAction = new QAction(tr("升级 TextEditor"), this);
     updateAction->setStatusTip(tr("升级应用程序"));
 
-    aboutAction = new QAction(tr("关于 MainWindow..."), this);
+    aboutAction = new QAction(tr("关于 TextEditor..."), this);
     aboutAction->setStatusTip(tr("显示应用的相关信息"));
     connect(aboutAction, &QAction::triggered,
             this, &MainWindow::about);
