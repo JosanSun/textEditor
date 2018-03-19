@@ -54,3 +54,5 @@ void TextEditor::textEditorChanged()
 {
     emit modifiedTextEditor();
 }
+
+

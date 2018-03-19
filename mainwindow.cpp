@@ -17,6 +17,7 @@
 #endif
 
 #include "mainwindow.h"
+#include "md5widget.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -262,6 +263,8 @@ void MainWindow::createActions()
     aboutAction->setStatusTip(tr("显示应用的相关信息"));
     connect(aboutAction, &QAction::triggered,
             this, &MainWindow::about);
+    connect(md5Action, &QAction::triggered,
+            this, &MainWindow::MD5WidgetShow);
 }
 
 void MainWindow::createMenus()
@@ -412,6 +415,12 @@ bool MainWindow::saveFile(const QString &fileName)
 QString MainWindow::strippedName(const QString &fileName)
 {
     return QFileInfo(fileName).fileName();
+}
+
+void MainWindow::MD5WidgetShow()
+{
+    MD5Widget* md5widget = new MD5Widget;
+    md5widget->show();
 }
 
 //void MainWindow::textModified()

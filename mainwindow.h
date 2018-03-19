@@ -1,4 +1,4 @@
-#ifndef MainWindow_H
+﻿#ifndef MainWindow_H
 #define MainWindow_H
 
 #include <QMainWindow>
@@ -35,6 +35,7 @@ private slots:
     void find();
     void about();
     void textEditorModified();
+    void MD5WidgetShow();
 
 private:
     void createActions();
