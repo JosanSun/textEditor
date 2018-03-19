@@ -26,11 +26,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         texteditor.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    md5widget.cpp
 
 HEADERS += \
         texteditor.h \
-    mainwindow.h
+    mainwindow.h \
+    md5widget.h
 
 RESOURCES += \
     texteditor.qrc
