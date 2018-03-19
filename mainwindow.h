@@ -2,7 +2,7 @@
 #define MainWindow_H
 
 #include <QMainWindow>
-#include <texteditor.h>
+#include "texteditor.h"
 
 class QAction;
 class QLabel;
@@ -34,9 +34,7 @@ private slots:
     void selectAll();
     void find();
     void about();
-
-    void textModified();
-    //void textUnmodified();
+    void textEditorModified();
 
 private:
     void createActions();
@@ -54,7 +52,7 @@ private:
     QString curFile;
     TextEditor* textEdit;
     QLabel* showLabel;
-    bool textIsModified;
+    //bool textIsModified;
 
     // 菜单项
     QMenu* fileMenu;
@@ -93,7 +91,7 @@ private:
     QAction* updateAction;
     QAction* aboutAction;
 
-    void textUnmodified();
+    //void textUnmodified();
 };
 
 #endif // MainWindow_H
