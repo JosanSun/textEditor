@@ -46,8 +46,6 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-<<<<<<< HEAD
-<<<<<<< HEAD
 //    if(textIsModified){
 //        QMessageBox::StandardButton ret;
 //        ret = QMessageBox::warning(this, tr("Save Changes"),
@@ -58,21 +56,6 @@ void MainWindow::closeEvent(QCloseEvent *event)
 //        if (ret == QMessageBox::Save)
 //            save();
 //    }
-=======
-=======
->>>>>>> parent of 86105cd... Fix a bug
-    QMessageBox::StandardButton ret;
-    ret = QMessageBox::warning(this, tr("Save Changes"),
-                               tr("The document has been modified.<br>"
-                                  "Do you want to save your changes?"),
-                               QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
-
-    if (ret == QMessageBox::Save)
-        save();
-<<<<<<< HEAD
->>>>>>> parent of 86105cd... Fix a bug
-=======
->>>>>>> parent of 86105cd... Fix a bug
     if(okToContinue())
     {
         event->accept();
@@ -118,14 +101,6 @@ bool MainWindow::save()
     {
         return saveFile(curFile);
     }
-<<<<<<< HEAD
-=======
-
-    textUnmodified();
-<<<<<<< HEAD
->>>>>>> parent of 86105cd... Fix a bug
-=======
->>>>>>> parent of 86105cd... Fix a bug
 }
 
 bool MainWindow::saveAs()
