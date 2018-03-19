@@ -36,7 +36,6 @@ private slots:
     void about();
     void textEditorModified();
 
-
 private:
     void createActions();
     void createMenus();
@@ -53,7 +52,7 @@ private:
     QString curFile;
     TextEditor* textEdit;
     QLabel* showLabel;
-    bool textIsModified;
+    //bool textIsModified;
 
     // 菜单项
     QMenu* fileMenu;

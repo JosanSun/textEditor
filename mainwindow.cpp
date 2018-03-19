@@ -87,14 +87,12 @@ void MainWindow::open()
         if(!fileName.isEmpty())
         {
             loadFile(fileName);
-            //textUnmodified();
         }
     }
 }
 
 bool MainWindow::save()
 {
-    //textUnmodified();
     if(curFile.isEmpty())
     {
         return saveAs();
@@ -103,8 +101,6 @@ bool MainWindow::save()
     {
         return saveFile(curFile);
     }
-
-
 }
 
 bool MainWindow::saveAs()
@@ -152,10 +148,10 @@ void MainWindow::selectAll()
 
 void MainWindow::about()
 {
-    QMessageBox::about(this, tr("关于 MainWindow"),
-            tr("<h2>MainWindow 1.0</h2>"
+    QMessageBox::about(this, tr("关于 TextEditor"),
+            tr("<h2>TextEditor 1.0</h2>"
                "<p>Copyright &copy; 2018 SouthEast University."
-               "<p>MainWindow是一个用来展示QAction, QMainWindow, QMenuBar, "
+               "<p>TextEditor是一个用来展示QAction, QMainWindow, QMenuBar, "
                "QStatusBar, QTableWidget, QToolBar以及其他Qt类用法"
                "<p>本软件仅用来交流讨论，有任何好的建议欢迎联系QQ:1030460698。"));
 }
@@ -163,6 +159,21 @@ void MainWindow::about()
 void MainWindow::textEditorModified()
 {
     setWindowModified(true);
+
+    // 这个方法虽然也能修改星号的位置，但是没有setCurrentFile()中的方法简单
+    // 修改*的位置
+    // eg:  C:/test/test.txt* -- Editor
+    // -->  *C:/test/test.txt -- Editor
+//    QString shownTitle = this->windowTitle();
+//    if(shownTitle.contains('*'))
+//    {
+//        if(shownTitle.contains("[*]"))
+//        {
+//            shownTitle.remove("[*]");
+//            shownTitle.push_front('*');
+//        }
+//        setWindowTitle(shownTitle);
+//    }
 }
 
 void MainWindow::createActions()
@@ -244,10 +255,10 @@ void MainWindow::createActions()
     md5Action = new QAction(tr("MD5"), this);
     md5Action->setStatusTip(tr("MD5校验"));
 
-    updateAction = new QAction(tr("升级 MainWindow"), this);
+    updateAction = new QAction(tr("升级 TextEditor"), this);
     updateAction->setStatusTip(tr("升级应用程序"));
 
-    aboutAction = new QAction(tr("关于 MainWindow..."), this);
+    aboutAction = new QAction(tr("关于 TextEditor..."), this);
     aboutAction->setStatusTip(tr("显示应用的相关信息"));
     connect(aboutAction, &QAction::triggered,
             this, &MainWindow::about);
@@ -263,7 +274,6 @@ void MainWindow::createMenus()
     fileMenu->addAction(saveAsAction);
 
     fileMenu->addSeparator();
-
     fileMenu->addAction(exitAction);
 
     // 编辑菜单
@@ -342,7 +352,11 @@ void MainWindow::setCurrentFile(const QString &fileName)
         shownName = curFile;
     }
 
-    setWindowTitle(tr("%1[*] - %2")
+    // 更简单的方法改变默认星号的位置 [*]可以解析 [#或者其他字符]无法解析
+//    setWindowTitle(tr("%1[*] - %2")
+//                   .arg(shownName)
+//                   .arg(tr("TextEditor")));
+    setWindowTitle(tr("[*]%1 - %2")
                    .arg(shownName)
                    .arg(tr("TextEditor")));
 }
