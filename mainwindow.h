@@ -2,8 +2,10 @@
 #define MainWindow_H
 
 #include <QMainWindow>
+#include <QtNetwork>
 #include "texteditor.h"
 #include "md5widget.h"
+
 
 class QAction;
 class QLabel;
@@ -54,9 +56,13 @@ private slots:
     void openRecentFile();
     void MD5WidgetShow();
 
+    void updateApp();
+    void onResultUpdate(QNetworkReply*);
+
+
 private:
     // 当前文件名
-    QString curFile;            // 带有路径的文件名 eg：
+    QString curFile;            // 带有路径的文件名 eg：C:\test\test.txt
     QStringList recentFiles;
     TextEditor* textEdit;
     QLabel* showLabel;
@@ -94,6 +100,9 @@ private:
     QAction* md5Action;
     QAction* updateAction;
     QAction* aboutAction;
+
+    void downloadNewApp();
+    QNetworkReply* currentReply;
 };
 
 #endif // MainWindow_H

@@ -144,7 +144,7 @@ void MainWindow::selectAll()
 void MainWindow::about()
 {
     QMessageBox::about(this, tr("关于 TextEditor"),
-            tr("<h2>TextEditor 1.0</h2>"
+            tr("<h2>TextEditor 2.0</h2>"
                "<p>Copyright &copy; 2018 SouthEast University."
                "<p>TextEditor是一个用来展示QAction, QMainWindow, QMenuBar, "
                "QStatusBar, QTableWidget, QToolBar以及其他Qt类用法"
@@ -257,10 +257,12 @@ void MainWindow::createActions()
     md5Action->setStatusTip(tr("MD5校验"));
     connect(md5Action, &QAction::triggered, this, &MainWindow::MD5WidgetShow);
 
-    updateAction = new QAction(tr("升级 MainWindow"), this);
+    updateAction = new QAction(tr("升级 TextEditor"), this);
     updateAction->setStatusTip(tr("升级应用程序"));
+    connect(updateAction, &QAction::triggered,
+            this, &MainWindow::updateApp);
 
-    aboutAction = new QAction(tr("关于 MainWindow..."), this);
+    aboutAction = new QAction(tr("关于 TextEditor..."), this);
     aboutAction->setStatusTip(tr("显示应用的相关信息"));
     connect(aboutAction, &QAction::triggered,
             this, &MainWindow::about);
@@ -455,13 +457,6 @@ void MainWindow::updateRecentFileActions()
         }
     }
     separatorAction->setVisible(!recentFiles.isEmpty());
-
-}
-
-// 取文件名  eg:C:/test/test.txt  --->  test.txt
-QString MainWindow::strippedName(const QString &fileName)
-{
-    return QFileInfo(fileName).fileName();
 }
 
 
@@ -471,7 +466,57 @@ void MainWindow::MD5WidgetShow()
     md5widget->show();
 }
 
+void MainWindow::updateApp()
+{
+    QNetworkAccessManager networkManager;
 
+    QUrl url("https://api.github.com/repos/JosanSun/textEditor/releases/latest");
+    // The current all existing releases are all pre-release
+    // So the json file is unavailable
+    QNetworkRequest request;
+    request.setUrl(url);
+
+    currentReply = networkManager.get(request);  // GET
+    connect(&networkManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(onResultUpdate(QNetworkReply*)));
+    QEventLoop eventLoop;
+    QObject::connect(&networkManager, &QNetworkAccessManager::finished, &eventLoop, &QEventLoop::quit);
+    eventLoop.exec();
+}
+
+
+void MainWindow::onResultUpdate(QNetworkReply* reply)
+{
+    if (currentReply->error() != QNetworkReply::NoError){
+        //qDebug()<<"ERROR!";
+        return;  // ...only in a blog post
+    }
+
+    QString data = (QString) reply->readAll();
+    //qDebug()<<data;
+    QJsonDocument d = QJsonDocument::fromJson(data.toUtf8());
+    QJsonObject sett2 = d.object();
+    QJsonValue value = sett2.value(QString("tag_name"));
+    //qDebug() << value;
+
+    if(value.toDouble() > VERSION){
+        QMessageBox::StandardButton button;
+        button = QMessageBox::question(this, tr("有新的版本"),
+                QString(tr("是否下载新的版本？")),
+                QMessageBox::Yes | QMessageBox::No);
+
+        if (button == QMessageBox::Yes){
+             downloadNewApp();
+        }
+    }
+    else{
+        QMessageBox::information(0, "更新检查","此版本已经是最新发布版本", QMessageBox::Yes);
+    }
+}
+
+void MainWindow::downloadNewApp()
+{
+
+}
 
 
 

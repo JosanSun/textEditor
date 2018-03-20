@@ -2,19 +2,18 @@
 #define MD5WIDGET_H
 
 #include <QWidget>
-#include <QtCore/QVariant>
-#include <QtWidgets/QAction>
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QButtonGroup>
-#include <QtWidgets/QCheckBox>
-#include <QtWidgets/QGridLayout>
-#include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QHeaderView>
-#include <QtWidgets/QLabel>
-#include <QtWidgets/QPlainTextEdit>
-#include <QtWidgets/QPushButton>
-#include <QtWidgets/QWidget>
-#include <QtWidgets/QTextBrowser>
+#include <QVariant>
+#include <QAction>
+#include <QApplication>
+#include <QButtonGroup>
+#include <QCheckBox>
+#include <QGridLayout>
+#include <QHBoxLayout>
+#include <QHeaderView>
+#include <QLabel>
+#include <QPlainTextEdit>
+#include <QPushButton>
+#include <QTextBrowser>
 
 class MD5Widget : public QWidget
 {

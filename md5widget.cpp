@@ -34,7 +34,7 @@ MD5Widget::MD5Widget(QWidget *parent) : QWidget(parent)
 
     closeButton = new QPushButton(this);
     closeButton->setObjectName(QStringLiteral("closeButton"));
-    QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+    QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
     sizePolicy.setHorizontalStretch(0);
     sizePolicy.setVerticalStretch(0);
     sizePolicy.setHeightForWidth(closeButton->sizePolicy().hasHeightForWidth());
