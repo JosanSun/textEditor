@@ -56,8 +56,10 @@ private slots:
     void openRecentFile();
     void MD5WidgetShow();
 
+
     void updateApp();
     void onResultUpdate(QNetworkReply*);
+
 
 
 private:

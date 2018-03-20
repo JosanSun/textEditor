@@ -457,6 +457,7 @@ void MainWindow::updateRecentFileActions()
         }
     }
     separatorAction->setVisible(!recentFiles.isEmpty());
+
 }
 
 
@@ -481,6 +482,8 @@ void MainWindow::updateApp()
     QEventLoop eventLoop;
     QObject::connect(&networkManager, &QNetworkAccessManager::finished, &eventLoop, &QEventLoop::quit);
     eventLoop.exec();
+
+
 }
 
 
