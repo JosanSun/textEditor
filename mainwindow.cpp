@@ -255,9 +255,9 @@ void MainWindow::createActions()
     optionAction = new QAction(tr("首选项..."), this);
     optionAction->setStatusTip(tr("配置程序"));
 
-    md5Action = new QAction(tr("MD5"), this);
-    md5Action->setStatusTip(tr("MD5校验"));
-    connect(md5Action, &QAction::triggered, this, &MainWindow::MD5WidgetShow);
+    generateMD5Action = new QAction(tr("生成..."), this);
+    generateMD5Action->setStatusTip(tr("MD5校验生成工具"));
+    connect(generateMD5Action, &QAction::triggered, this, &MainWindow::MD5WidgetShow);
 
     updateAction = new QAction(tr("升级 TextEditor"), this);
     updateAction->setStatusTip(tr("升级应用程序"));
@@ -308,7 +308,9 @@ void MainWindow::createMenus()
 
     // 工具菜单
     toolsMenu = menuBar()->addMenu(tr("工具(&O)"));
-    toolsMenu->addAction(md5Action);
+    md5Menu = new QMenu(tr("MD5"));
+    toolsMenu->addMenu(md5Menu);
+    md5Menu->addAction(generateMD5Action);
 
     // 帮助菜单
     helpMenu = menuBar()->addMenu(tr("帮助(&H)"));

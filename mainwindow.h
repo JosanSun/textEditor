@@ -76,6 +76,7 @@ private:
     QMenu* viewMenu;
     QMenu* settingsMenu;
     QMenu* toolsMenu;
+    QMenu* md5Menu;
     QMenu* helpMenu;
 
     // 工具栏
@@ -99,7 +100,7 @@ private:
     QAction* findAction;
     QAction* fullScreenAction;
     QAction* optionAction;
-    QAction* md5Action;
+    QAction* generateMD5Action;
     QAction* updateAction;
     QAction* aboutAction;
 
