@@ -59,7 +59,7 @@ private slots:
 private:
     // 当前文件名
     QString curFile;            // 带有路径的文件名 eg：C:\test\test.txt
-    QStringList recentFiles;
+    QStringList recentFiles;    // recentFiles文件名存储格式与curFile一致
     TextEditor* textEdit;
     QLabel* showLabel;
 

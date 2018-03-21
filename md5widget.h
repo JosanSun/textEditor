@@ -2,15 +2,10 @@
 #define MD5WIDGET_H
 
 #include <QWidget>
-#include <QVariant>
-#include <QAction>
 #include <QApplication>
-#include <QButtonGroup>
 #include <QCheckBox>
 #include <QGridLayout>
 #include <QHBoxLayout>
-#include <QHeaderView>
-#include <QLabel>
 #include <QPlainTextEdit>
 #include <QPushButton>
 #include <QTextBrowser>
@@ -22,21 +17,20 @@ public:
     explicit MD5Widget(QWidget *parent = nullptr);
 
 private:
+    QVBoxLayout *mainLayout;
+    QWidget *widget;
     QGridLayout *gridLayout;
     QPlainTextEdit *inputBox;
+    QCheckBox *splitEachRowBox;
     QTextBrowser *outputBox;
     QPushButton *copyButton;
+    QWidget *widget_2;
+    QHBoxLayout *horizontalLayout;
+    QSpacerItem *horizontalSpacer;
     QPushButton *closeButton;
-    QHBoxLayout *splitEachRowLayout;
-    QCheckBox *splitEachRowBox;
-    QLabel *splitEachRowLabel;
-
-signals:
-
-public slots:
+    QSpacerItem *horizontalSpacer_2;
 
 private slots:
-    void exitMD5();
     void generateMD5();
     void copyOutput();
 };

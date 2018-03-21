@@ -160,6 +160,8 @@ void MainWindow::openRecentFile()
 {
     if(okToContinue())
     {
+        // QObject *QObject::sender() const
+        // Returns a pointer to the object that sent the signal
         QAction* action = qobject_cast<QAction *>(sender());
         if(action)
         {
