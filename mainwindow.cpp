@@ -40,7 +40,7 @@ MainWindow::MainWindow(QWidget *parent)
     this->setCurrentFile("");
     this->resize(500, 300);
 
-    connect(textEdit, &TextEditor::modifiedTextEditor,
+    connect(textEdit, &TextEditor::textChanged,
             this, &MainWindow::textEditorModified);
 
 }
@@ -111,36 +111,6 @@ bool MainWindow::saveAs()
     return saveFile(fileName);
 }
 
-void MainWindow::find()
-{
-
-}
-
-void MainWindow::cut()
-{
-
-}
-
-void MainWindow::copy()
-{
-
-}
-
-void MainWindow::paste()
-{
-
-}
-
-void MainWindow::deleteText()
-{
-
-}
-
-void MainWindow::selectAll()
-{
-
-}
-
 void MainWindow::about()
 {
     QMessageBox::about(this, tr("关于 TextEditor"),
@@ -194,6 +164,8 @@ void MainWindow::createActions()
             this, &MainWindow::save);
 
     saveAsAction = new QAction(tr("另存为(&A)..."), this);
+    saveAsAction->setShortcut(tr("Ctrl+Alt+S"));
+    //saveAsAction->setShortcut(QKeySequence::SaveAs);  // other method
     saveAsAction->setStatusTip(tr("将文件另存为..."));
     connect(saveAsAction, &QAction::triggered,
             this, &MainWindow::saveAs);
@@ -213,40 +185,57 @@ void MainWindow::createActions()
     connect(exitAction, &QAction::triggered,
             this, &MainWindow::close);
 
+    undoAction = new QAction(tr("撤销(&U)"), this);
+    undoAction->setIcon(QIcon(":/images/undo.png"));
+    undoAction->setShortcut(QKeySequence::Undo);
+    undoAction->setStatusTip(tr("撤销"));
+    connect(undoAction, &QAction::triggered,
+            textEdit, &TextEditor::undo);
+
+    redoAction = new QAction(tr("恢复(&R)"), this);
+    redoAction->setIcon(QIcon(":/images/redo.png"));
+    redoAction->setShortcut(QKeySequence::Redo);
+    redoAction->setStatusTip(tr("恢复"));
+    connect(redoAction, &QAction::triggered,
+            textEdit, &TextEditor::redo);
+
     cutAction = new QAction(tr("剪切(&T)"), this);
     cutAction->setIcon(QIcon(":/images/cut.png"));
     cutAction->setShortcut(QKeySequence::Cut);
     cutAction->setStatusTip(tr("剪切文本"));
     connect(cutAction, &QAction::triggered,
-            this, &MainWindow::cut);
+            textEdit, &TextEditor::cut);
 
     copyAction = new QAction(tr("复制(&C)"), this);
     copyAction->setIcon(QIcon(":/images/copy.png"));
     copyAction->setShortcut(QKeySequence::Copy);
     copyAction->setStatusTip(tr("复制文本"));
     connect(copyAction, &QAction::triggered,
-            this, &MainWindow::copy);
+            textEdit, &TextEditor::copy);
 
     pasteAction = new QAction(tr("粘贴(&P)"), this);
     pasteAction->setIcon(QIcon(":/images/paste.png"));
     pasteAction->setShortcut(QKeySequence::Paste);
     pasteAction->setStatusTip(tr("粘贴文本"));
     connect(pasteAction, &QAction::triggered,
-            this, &MainWindow::paste);
+            textEdit, &TextEditor::paste);
 
     deleteAction = new QAction(tr("删除(&D)"), this);
     deleteAction->setShortcut(QKeySequence::Delete);
     deleteAction->setStatusTip(tr("删除所选文本"));
     connect(deleteAction, &QAction::triggered,
-            this, &MainWindow::deleteText);
+            textEdit, &TextEditor::deleteText);
 
     selectAllAction = new QAction(tr("全选(&L)"), this);
+    selectAllAction->setShortcut(QKeySequence::SelectAll);
     selectAllAction->setStatusTip(tr("全选文本"));
     connect(selectAllAction, &QAction::triggered,
-            this, &MainWindow::selectAll);
+            textEdit, &TextEditor::selectAll);
 
     findAction = new QAction(tr("查找(&F)..."), this);
     findAction->setStatusTip(tr("查找文本"));
+    connect(findAction, &QAction::triggered,
+            textEdit, &TextEditor::find);
 
     fullScreenAction = new QAction(tr("切换全屏模式"), this);
     fullScreenAction->setShortcut(QKeySequence::FullScreen);
@@ -288,6 +277,9 @@ void MainWindow::createMenus()
 
     // 编辑菜单
     editMenu = menuBar()->addMenu(tr("编辑(&E)"));
+    editMenu->addAction(undoAction);
+    editMenu->addAction(redoAction);
+    editMenu->addSeparator();
     editMenu->addAction(cutAction);
     editMenu->addAction(copyAction);
     editMenu->addAction(pasteAction);
@@ -334,10 +326,13 @@ void MainWindow::createToolBars()
     fileToolBar->addAction(saveAction);
 
     editToolBar = addToolBar(tr("&Edit"));
+    editToolBar->addAction(undoAction);
+    editToolBar->addAction(redoAction);
+    editToolBar->addSeparator();
     editToolBar->addAction(cutAction);
     editToolBar->addAction(copyAction);
     editToolBar->addAction(pasteAction);
-    editToolBar->addSeparator();
+
 }
 
 void MainWindow::createStatusBar()
@@ -464,11 +459,11 @@ void MainWindow::updateRecentFileActions()
 
 }
 
-
 void MainWindow::MD5WidgetShow()
 {
     MD5Widget* md5widget = new MD5Widget;
     md5widget->show();
+    md5widget->setAttribute(Qt::WA_DeleteOnClose);   // 防止内存泄漏
 }
 
 void MainWindow::updateApp()
@@ -486,14 +481,13 @@ void MainWindow::updateApp()
     QEventLoop eventLoop;
     QObject::connect(&networkManager, &QNetworkAccessManager::finished, &eventLoop, &QEventLoop::quit);
     eventLoop.exec();
-
-
 }
 
 
 void MainWindow::onResultUpdate(QNetworkReply* reply)
 {
-    if (currentReply->error() != QNetworkReply::NoError){
+    if (currentReply->error() != QNetworkReply::NoError)
+    {
         //qDebug()<<"ERROR!";
         return;  // ...only in a blog post
     }
@@ -505,17 +499,20 @@ void MainWindow::onResultUpdate(QNetworkReply* reply)
     QJsonValue value = sett2.value(QString("tag_name"));
     //qDebug() << value;
 
-    if(value.toDouble() > VERSION){
+    if(value.toDouble() > VERSION)
+    {
         QMessageBox::StandardButton button;
         button = QMessageBox::question(this, tr("有新的版本"),
                 QString(tr("是否下载新的版本？")),
                 QMessageBox::Yes | QMessageBox::No);
 
-        if (button == QMessageBox::Yes){
+        if (button == QMessageBox::Yes)
+        {
              downloadNewApp();
         }
     }
-    else{
+    else
+    {
         QMessageBox::information(0, "更新检查","此版本已经是最新发布版本", QMessageBox::Yes);
     }
 }

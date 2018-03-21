@@ -1,6 +1,13 @@
 # Change Log
 # All notable changes to this project will be documented in this file.
 
+## [2.1.1] 2018-03-21
+### Added
+- 增加升级TextEditor功能.[@scienceasdf更新] 存在BUG,待修复。
+- 美化生成MD5校验码界面
+- 增加编辑菜单部分的事件响应
+- 对代码做简化，去掉一些无关的函数。
+
 ## [2.1] 2018-03-19
 ### Added
 - 增加对MD5校验的支持.[@scienceasdf更新]

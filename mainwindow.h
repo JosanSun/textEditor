@@ -45,12 +45,6 @@ private slots:
     void open();
     bool save();
     bool saveAs();
-    void cut();
-    void copy();
-    void paste();
-    void deleteText();
-    void selectAll();
-    void find();
     void about();
     void textEditorModified();
     void openRecentFile();
@@ -92,6 +86,8 @@ private:
     QAction* recentFileActions[MaxRecentFiles];
     QAction* separatorAction;        // 用于最近打开文件菜单项的分隔
     QAction* exitAction;
+    QAction* undoAction;
+    QAction* redoAction;
     QAction* cutAction;
     QAction* copyAction;
     QAction* pasteAction;
