@@ -2,6 +2,7 @@
 #define MainWindow_H
 
 #include <QMainWindow>
+#include <QtNetwork>
 #include "texteditor.h"
 #include "md5widget.h"
 
@@ -56,6 +57,11 @@ private slots:
     void MD5WidgetShow();
 
 
+    void updateApp();
+    void onResultUpdate(QNetworkReply*);
+
+
+
 private:
     // 当前文件名
     QString curFile;            // 带有路径的文件名 eg：C:\test\test.txt
@@ -96,6 +102,9 @@ private:
     QAction* md5Action;
     QAction* updateAction;
     QAction* aboutAction;
+
+    void downloadNewApp();
+    QNetworkReply* currentReply;
 };
 
 #endif // MainWindow_H

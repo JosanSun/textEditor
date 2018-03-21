@@ -259,6 +259,8 @@ void MainWindow::createActions()
 
     updateAction = new QAction(tr("升级 TextEditor"), this);
     updateAction->setStatusTip(tr("升级应用程序"));
+    connect(updateAction, &QAction::triggered,
+            this, &MainWindow::updateApp);
 
     aboutAction = new QAction(tr("关于 TextEditor..."), this);
     aboutAction->setStatusTip(tr("显示应用的相关信息"));
@@ -455,6 +457,7 @@ void MainWindow::updateRecentFileActions()
         }
     }
     separatorAction->setVisible(!recentFiles.isEmpty());
+
 }
 
 
@@ -464,7 +467,59 @@ void MainWindow::MD5WidgetShow()
     md5widget->show();
 }
 
+void MainWindow::updateApp()
+{
+    QNetworkAccessManager networkManager;
 
+    QUrl url("https://api.github.com/repos/JosanSun/textEditor/releases/latest");
+    // The current all existing releases are all pre-release
+    // So the json file is unavailable
+    QNetworkRequest request;
+    request.setUrl(url);
+
+    currentReply = networkManager.get(request);  // GET
+    connect(&networkManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(onResultUpdate(QNetworkReply*)));
+    QEventLoop eventLoop;
+    QObject::connect(&networkManager, &QNetworkAccessManager::finished, &eventLoop, &QEventLoop::quit);
+    eventLoop.exec();
+
+
+}
+
+
+void MainWindow::onResultUpdate(QNetworkReply* reply)
+{
+    if (currentReply->error() != QNetworkReply::NoError){
+        //qDebug()<<"ERROR!";
+        return;  // ...only in a blog post
+    }
+
+    QString data = (QString) reply->readAll();
+    //qDebug()<<data;
+    QJsonDocument d = QJsonDocument::fromJson(data.toUtf8());
+    QJsonObject sett2 = d.object();
+    QJsonValue value = sett2.value(QString("tag_name"));
+    //qDebug() << value;
+
+    if(value.toDouble() > VERSION){
+        QMessageBox::StandardButton button;
+        button = QMessageBox::question(this, tr("有新的版本"),
+                QString(tr("是否下载新的版本？")),
+                QMessageBox::Yes | QMessageBox::No);
+
+        if (button == QMessageBox::Yes){
+             downloadNewApp();
+        }
+    }
+    else{
+        QMessageBox::information(0, "更新检查","此版本已经是最新发布版本", QMessageBox::Yes);
+    }
+}
+
+void MainWindow::downloadNewApp()
+{
+
+}
 
 
 
