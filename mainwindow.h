@@ -6,13 +6,14 @@
 #include "texteditor.h"
 #include "md5widget.h"
 
-
+QT_BEGIN_NAMESPACE
 class QAction;
 class QLabel;
 class QMenu;
 class QToolBar;
 class QTextEdit;
 class QCloseEvent;
+QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow
 {

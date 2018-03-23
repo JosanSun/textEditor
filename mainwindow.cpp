@@ -11,6 +11,7 @@
 #include <QCloseEvent>
 #include <QSettings>
 #include <QStringList>
+#include <QDesktopWidget>
 
 #ifdef _MSC_VER
 #if _MSC_VER >= 1600
@@ -38,7 +39,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     setWindowIcon(QIcon(":/images/fileIcon.png"));
     this->setCurrentFile("");
-    this->resize(500, 300);
+    //this->resize(500, 300);
+    setUnifiedTitleAndToolBarOnMac(true);
 
     connect(textEdit, &TextEditor::textChanged,
             this, &MainWindow::textEditorModified);
@@ -113,12 +115,12 @@ bool MainWindow::saveAs()
 
 void MainWindow::about()
 {
-    QMessageBox::about(this, tr("关于 TextEditor"),
+    QMessageBox::about(this, tr("关于 <b>TextEditor</b>"),
             tr("<h2>TextEditor 2.0</h2>"
                "<p>Copyright &copy; 2018 SouthEast University."
-               "<p>TextEditor是一个用来展示QAction, QMainWindow, QMenuBar, "
-               "QStatusBar, QTableWidget, QToolBar以及其他Qt类用法"
-               "<p>本软件仅用来交流讨论，有任何好的建议欢迎联系QQ:1030460698。"));
+               "<p><b>TextEditor</b>是一个用来展示QAction, QMainWindow, QMenuBar, "
+               "QStatusBar, QTableWidget, QToolBar以及其他Qt类用法."
+               "<p>本软件仅用来交流讨论，有任何好的建议欢迎联系QQ:1030460698."));
 }
 
 void MainWindow::textEditorModified()
@@ -203,15 +205,19 @@ void MainWindow::createActions()
     cutAction->setIcon(QIcon(":/images/cut.png"));
     cutAction->setShortcut(QKeySequence::Cut);
     cutAction->setStatusTip(tr("剪切文本"));
+    cutAction->setEnabled(false);
     connect(cutAction, &QAction::triggered,
             textEdit, &TextEditor::cut);
+    connect(textEdit, &TextEditor::copyAvailable, cutAction, &QAction::setEnabled);
 
     copyAction = new QAction(tr("复制(&C)"), this);
     copyAction->setIcon(QIcon(":/images/copy.png"));
     copyAction->setShortcut(QKeySequence::Copy);
     copyAction->setStatusTip(tr("复制文本"));
+    copyAction->setEnabled(false);
     connect(copyAction, &QAction::triggered,
             textEdit, &TextEditor::copy);
+    connect(textEdit, &TextEditor::copyAvailable, copyAction, &QAction::setEnabled);
 
     pasteAction = new QAction(tr("粘贴(&P)"), this);
     pasteAction->setIcon(QIcon(":/images/paste.png"));
@@ -370,6 +376,19 @@ void MainWindow::readSettings()
 {
     QSettings settings("SouthEast University", "TextEditor");
 
+    const QByteArray geometry = settings.value("geometry", QByteArray()).toByteArray();
+    if (geometry.isEmpty())
+    {
+        const QRect availableGeometry = QApplication::desktop()->availableGeometry(this);
+        resize(availableGeometry.width() / 3, availableGeometry.height() / 2);
+        move((availableGeometry.width() - width()) / 2,
+             (availableGeometry.height() - height()) / 2);
+    }
+    else
+    {
+        restoreGeometry(geometry);
+    }
+
     recentFiles = settings.value("recentFiles").toStringList();
     updateRecentFileActions();
 }
@@ -377,6 +396,8 @@ void MainWindow::readSettings()
 void MainWindow::writeSettings()
 {
     QSettings settings("SouthEast University", "TextEditor");
+
+    settings.setValue("geometry", saveGeometry());
 
     settings.setValue("recentFiles", recentFiles);
 }

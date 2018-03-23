@@ -23,9 +23,15 @@ bool TextEditor::readFile(const QString &fileName)
     }
 
     QTextStream in(&file);
+#ifndef QT_NO_CURSOR
     QApplication::setOverrideCursor(Qt::WaitCursor);
+#endif
+
     setPlainText(in.readAll());
+
+#ifndef QT_NO_CURSOR
     QApplication::restoreOverrideCursor();
+#endif
     return true;
 }
 
@@ -42,9 +48,15 @@ bool TextEditor::writeFile(const QString &fileName)
     }
 
     QTextStream out(&file);
+#ifndef QT_NO_CURSOR
     QApplication::setOverrideCursor(Qt::WaitCursor);
+#endif
+
     out << this -> toPlainText();
+
+#ifndef QT_NO_CURSOR
     QApplication::restoreOverrideCursor();
+#endif
     return true;
 }
 
