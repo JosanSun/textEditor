@@ -12,6 +12,7 @@
 #include <QSettings>
 #include <QStringList>
 #include <QDesktopWidget>
+#include <QKeyEvent>
 
 #ifdef _MSC_VER
 #if _MSC_VER >= 1600
@@ -164,6 +165,12 @@ void MainWindow::createActions()
     saveAction->setStatusTip("保存文件");
     connect(saveAction, &QAction::triggered,
             this, &MainWindow::save);
+    connect(textEdit, &TextEditor::textChanged,
+            [this]()
+    {
+        this->saveAction->setEnabled(true);
+    });
+    saveAction->setEnabled(false);
 
     saveAsAction = new QAction(tr("另存为(&A)..."), this);
     saveAsAction->setShortcut(tr("Ctrl+Alt+S"));
@@ -193,6 +200,10 @@ void MainWindow::createActions()
     undoAction->setStatusTip(tr("撤销"));
     connect(undoAction, &QAction::triggered,
             textEdit, &TextEditor::undo);
+    connect(textEdit, &TextEditor::undoAvailable,
+            undoAction, &QAction::setEnabled);
+    // 设定初始状态，注意与【复制】，【剪切】等动作的区别
+    undoAction->setEnabled(false);
 
     redoAction = new QAction(tr("恢复(&R)"), this);
     redoAction->setIcon(QIcon(":/images/redo.png"));
@@ -200,6 +211,9 @@ void MainWindow::createActions()
     redoAction->setStatusTip(tr("恢复"));
     connect(redoAction, &QAction::triggered,
             textEdit, &TextEditor::redo);
+    connect(textEdit, &TextEditor::redoAvailable,
+            redoAction, &QAction::setEnabled);
+    redoAction->setEnabled(false);
 
     cutAction = new QAction(tr("剪切(&T)"), this);
     cutAction->setIcon(QIcon(":/images/cut.png"));
@@ -230,7 +244,13 @@ void MainWindow::createActions()
     deleteAction->setShortcut(QKeySequence::Delete);
     deleteAction->setStatusTip(tr("删除所选文本"));
     connect(deleteAction, &QAction::triggered,
-            textEdit, &TextEditor::deleteText);
+            [=]()
+            {
+                QKeyEvent* event = new QKeyEvent(QEvent::KeyPress,
+                                                 Qt::Key_Delete, Qt::NoModifier);
+                QCoreApplication::postEvent(textEdit, event);
+            });
+    connect(textEdit, &TextEditor::copyAvailable, deleteAction, &QAction::setEnabled);
 
     selectAllAction = new QAction(tr("全选(&L)"), this);
     selectAllAction->setShortcut(QKeySequence::SelectAll);

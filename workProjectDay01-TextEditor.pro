@@ -38,3 +38,5 @@ RESOURCES += \
     texteditor.qrc
 
 DEFINES += "VERSION=2.2"
+
+CONFIG += c++11
