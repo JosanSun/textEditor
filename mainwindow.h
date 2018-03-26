@@ -22,6 +22,8 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    // 为了在main()中调用，改为public权限。
+    bool loadFile(const QString& fileName);
 
 protected:
     void closeEvent(QCloseEvent* event);
@@ -36,7 +38,7 @@ private:
     void writeSettings();
     bool okToContinue();
     void setCurrentFile(const QString& fileName);
-    bool loadFile(const QString& fileName);
+    // bool loadFile(const QString& fileName);
     bool saveFile(const QString& fileName);
     void updateRecentFileActions();
     QString strippedName(const QString& fileName);

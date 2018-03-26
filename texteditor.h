@@ -12,7 +12,6 @@ public:
     bool writeFile(const QString& fileName);
 
 public slots:
-    void deleteText();
     void find();
 
 };

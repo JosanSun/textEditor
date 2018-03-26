@@ -394,7 +394,8 @@ void MainWindow::setCurrentFile(const QString &fileName)
 
 void MainWindow::readSettings()
 {
-    QSettings settings("SouthEast University", "TextEditor");
+    QSettings settings(QCoreApplication::organizationName(),
+                       QCoreApplication::applicationName());
 
     const QByteArray geometry = settings.value("geometry", QByteArray()).toByteArray();
     if (geometry.isEmpty())
@@ -415,7 +416,8 @@ void MainWindow::readSettings()
 
 void MainWindow::writeSettings()
 {
-    QSettings settings("SouthEast University", "TextEditor");
+    QSettings settings(QCoreApplication::organizationName(),
+                       QCoreApplication::applicationName());
 
     settings.setValue("geometry", saveGeometry());
 

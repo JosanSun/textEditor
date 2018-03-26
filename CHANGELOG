@@ -1,6 +1,18 @@
 # Change Log
 # All notable changes to this project will be documented in this file.
 
+## [2.1.2] 2018-03-26
+### Added
+- 增加了保存, 撤销, 重做等菜单项的是否有效的判断。
+
+### Fixed
+- 修复了delete动作无法响应的问题
+
+### ToDoList
+- 增加对粘贴等菜单项的是否有效判断
+- 状态栏增加INS或者OVR的判断
+- 增加状态栏编码方式的显示
+
 ## [2.1.1] 2018-03-21
 ### Added
 - 增加升级TextEditor功能.[@scienceasdf更新] 存在BUG,待修复。

@@ -60,13 +60,6 @@ bool TextEditor::writeFile(const QString &fileName)
     return true;
 }
 
-void TextEditor::deleteText()
-{
-    // 【wanted to solve】
-    // sendKeyEvent();
-    // 换句话说，如何传递del键盘点击事件
-}
-
 void TextEditor::find()
 {
 
