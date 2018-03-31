@@ -341,6 +341,8 @@ void MainWindow::createContextMenu()
     textEdit->addAction(copyAction);
     textEdit->addAction(cutAction);
     textEdit->addAction(pasteAction);
+    textEdit->addAction(deleteAction);
+    textEdit->addAction(selectAllAction);
     textEdit->setContextMenuPolicy(Qt::ActionsContextMenu);
 }
 
