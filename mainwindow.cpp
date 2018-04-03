@@ -13,6 +13,8 @@
 #include <QStringList>
 #include <QDesktopWidget>
 #include <QKeyEvent>
+#include <QPrinter>
+#include <QPrintDialog>
 
 #ifdef _MSC_VER
 #if _MSC_VER >= 1600
@@ -45,6 +47,20 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(textEdit, &TextEditor::textChanged,
             this, &MainWindow::textEditorModified);
+    connect(textEdit, &TextEditor::cursorPositionChanged,
+            this, &MainWindow::showCursorPosition);
+    connect(textEdit, &TextEditor::overwriteModeChanged,
+            [=]()
+            {
+               if(textEdit->overwriteMode())
+               {
+                   insertModeLabel->setText("OVR");
+               }
+               else
+               {
+                   insertModeLabel->setText("INS");
+               }
+            });
 
 }
 
@@ -114,6 +130,25 @@ bool MainWindow::saveAs()
     return saveFile(fileName);
 }
 
+void MainWindow::printFile()
+{
+
+    QPrinter printer(QPrinter::HighResolution);
+    textEdit->print(&printer);
+//    QPrintDialog* dlg = new QPrintDialog(&printer, this);
+//    if(textEdit->textCursor().hasSelection())
+//    {
+//        dlg->addEnabledOption(QAbstractPrintDialog::PrintSelection);
+//    }
+//    dlg->setWindowTitle(tr("Print TextEditor Document"));
+//    if(QDialog::Accepted == dlg->exec())
+//    {
+//        textEdit->print(&printer);
+//    }
+//    delete dlg;
+
+}
+
 void MainWindow::about()
 {
     QMessageBox::about(this, tr("关于 <b>TextEditor</b>"),
@@ -174,10 +209,17 @@ void MainWindow::createActions()
 
     saveAsAction = new QAction(tr("另存为(&A)..."), this);
     saveAsAction->setShortcut(tr("Ctrl+Alt+S"));
-    //saveAsAction->setShortcut(QKeySequence::SaveAs);  // other method
+    // saveAsAction->setShortcut(QKeySequence::SaveAs);  // other method
     saveAsAction->setStatusTip(tr("将文件另存为..."));
     connect(saveAsAction, &QAction::triggered,
             this, &MainWindow::saveAs);
+
+    printAction = new QAction(tr("打印..."), this);
+    printAction->setIcon(QIcon(":/images/print.png"));
+    printAction->setShortcut(QKeySequence::Print);
+    printAction->setStatusTip(tr("打印文档"));
+    connect(printAction, &QAction::triggered,
+            this, &MainWindow::printFile);
 
     // 文件菜单 --> 最近打开文件
     for(int i = 0; i < MaxRecentFiles; ++i)
@@ -293,6 +335,8 @@ void MainWindow::createMenus()
     fileMenu->addAction(openAction);
     fileMenu->addAction(saveAction);
     fileMenu->addAction(saveAsAction);
+    fileMenu->addSeparator();
+    fileMenu->addAction(printAction);
     separatorAction = fileMenu->addSeparator();
     for(int i = 0; i < MaxRecentFiles; ++i)
     {
@@ -352,6 +396,7 @@ void MainWindow::createToolBars()
     fileToolBar->addAction(newAction);
     fileToolBar->addAction(openAction);
     fileToolBar->addAction(saveAction);
+    fileToolBar->addAction(printAction);
 
     editToolBar = addToolBar(tr("&Edit"));
     editToolBar->addAction(undoAction);
@@ -369,7 +414,20 @@ void MainWindow::createStatusBar()
     showLabel->setAlignment(Qt::AlignLeft);
     showLabel->setMinimumSize(showLabel->sizeHint());
 
+    insertModeLabel = new QLabel(tr("INS"));
+//    if(textEdit->overwriteMode())
+//    {
+//        insertModeLabel->setText("OVR");
+//    }
+//    else
+//    {
+//        insertModeLabel->setText("INS");
+//    }
+    insertModeLabel->setAlignment(Qt::AlignLeft);
+    insertModeLabel->setMinimumSize(insertModeLabel->sizeHint());
+
     statusBar()->addWidget(showLabel);
+    statusBar()->addPermanentWidget(insertModeLabel);
 }
 
 void MainWindow::setCurrentFile(const QString &fileName)
@@ -561,6 +619,15 @@ void MainWindow::onResultUpdate(QNetworkReply* reply)
         QMessageBox::information(0, "更新检查","此版本已经是最新发布版本", QMessageBox::Yes);
     }
 }
+
+// 显示当前光标所在的行列号
+void MainWindow::showCursorPosition()
+{
+    int row = textEdit->document()->blockCount();
+    int col = textEdit->textCursor().columnNumber();
+    showLabel->setText(tr("Ln : %1   Col : %2").arg(row).arg(col));
+}
+
 
 void MainWindow::downloadNewApp()
 {

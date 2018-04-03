@@ -48,14 +48,16 @@ private slots:
     void open();
     bool save();
     bool saveAs();
+    void printFile();
     void about();
     void textEditorModified();
     void openRecentFile();
     void MD5WidgetShow();
 
-
     void updateApp();
     void onResultUpdate(QNetworkReply*);
+
+    void showCursorPosition();
 
 
 
@@ -65,6 +67,7 @@ private:
     QStringList recentFiles;    // recentFiles文件名存储格式与curFile一致
     TextEditor* textEdit;
     QLabel* showLabel;
+    QLabel* insertModeLabel;
 
     // 菜单项
     QMenu* fileMenu;
@@ -85,6 +88,7 @@ private:
     QAction* openAction;
     QAction* saveAction;
     QAction* saveAsAction;
+    QAction* printAction;
     enum{ MaxRecentFiles = 5 };
     QAction* recentFileActions[MaxRecentFiles];
     QAction* separatorAction;        // 用于最近打开文件菜单项的分隔

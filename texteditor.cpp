@@ -2,6 +2,7 @@
 #include <QApplication>
 #include <QFile>
 #include <QTextStream>
+#include <QKeyEvent>
 
 #include "texteditor.h"
 
@@ -59,6 +60,19 @@ bool TextEditor::writeFile(const QString &fileName)
 #endif
     return true;
 }
+
+void TextEditor::keyPressEvent(QKeyEvent *ev)
+{
+    if( Qt::Key_Insert == ev->key())
+    {
+        // 置反当前写入模式
+        setOverwriteMode(!overwriteMode());
+        emit overwriteModeChanged();
+        return ;
+    }
+    QTextEdit::keyPressEvent(ev);
+}
+
 
 void TextEditor::find()
 {
