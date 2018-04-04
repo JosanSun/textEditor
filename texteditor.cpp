@@ -14,7 +14,7 @@ TextEditor::TextEditor(QWidget* parent):QTextEdit(parent)
 bool TextEditor::readFile(const QString &fileName)
 {
     QFile file(fileName);
-    if(!file.open(QIODevice::ReadOnly))
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         QMessageBox::warning(this, tr("TextEditor"),
                              tr("Cannot read file %1.\n%2.")

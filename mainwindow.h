@@ -67,6 +67,7 @@ private:
     QStringList recentFiles;    // recentFiles文件名存储格式与curFile一致
     TextEditor* textEdit;
     QLabel* showLabel;
+    QLabel* rowColumnLabel;
     QLabel* insertModeLabel;
 
     // 菜单项

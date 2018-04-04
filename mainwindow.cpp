@@ -183,6 +183,7 @@ void MainWindow::createActions()
     newAction = new QAction(tr("新建(&N)"), this);
     newAction->setIcon(QIcon(":/images/new.png"));
     newAction->setShortcut(QKeySequence::New);
+    newAction->setToolTip(tr("新建一个文件"));
     newAction->setStatusTip(tr("新建一个文件"));
     connect(newAction, &QAction::triggered,
             this, &MainWindow::newFile);
@@ -190,6 +191,7 @@ void MainWindow::createActions()
     openAction = new QAction(tr("打开(&O)"), this);
     openAction->setIcon(QIcon(":/images/open.png"));
     openAction->setShortcut(QKeySequence::Open);
+    openAction->setToolTip(tr("打开一个文件"));
     openAction->setStatusTip(tr("打开一个文件"));
     connect(openAction, &QAction::triggered,
             this, &MainWindow::open);
@@ -197,6 +199,7 @@ void MainWindow::createActions()
     saveAction = new QAction(tr("保存(&S)"), this);
     saveAction->setIcon(QIcon(":/images/save.png"));
     saveAction->setShortcut(QKeySequence::Save);
+    saveAction->setToolTip("保存文件");
     saveAction->setStatusTip("保存文件");
     connect(saveAction, &QAction::triggered,
             this, &MainWindow::save);
@@ -210,6 +213,7 @@ void MainWindow::createActions()
     saveAsAction = new QAction(tr("另存为(&A)..."), this);
     saveAsAction->setShortcut(tr("Ctrl+Alt+S"));
     // saveAsAction->setShortcut(QKeySequence::SaveAs);  // other method
+    saveAsAction->setToolTip(tr("将文件另存为..."));
     saveAsAction->setStatusTip(tr("将文件另存为..."));
     connect(saveAsAction, &QAction::triggered,
             this, &MainWindow::saveAs);
@@ -217,6 +221,7 @@ void MainWindow::createActions()
     printAction = new QAction(tr("打印..."), this);
     printAction->setIcon(QIcon(":/images/print.png"));
     printAction->setShortcut(QKeySequence::Print);
+    printAction->setToolTip(tr("打印文档"));
     printAction->setStatusTip(tr("打印文档"));
     connect(printAction, &QAction::triggered,
             this, &MainWindow::printFile);
@@ -232,6 +237,7 @@ void MainWindow::createActions()
 
     exitAction = new QAction(tr("关闭"), this);
     exitAction->setShortcut(tr("Ctrl+Q"));
+    exitAction->setToolTip(tr("退出程序"));
     exitAction->setStatusTip(tr("退出程序"));
     connect(exitAction, &QAction::triggered,
             this, &MainWindow::close);
@@ -239,6 +245,7 @@ void MainWindow::createActions()
     undoAction = new QAction(tr("撤销(&U)"), this);
     undoAction->setIcon(QIcon(":/images/undo.png"));
     undoAction->setShortcut(QKeySequence::Undo);
+    undoAction->setToolTip(tr("撤销"));
     undoAction->setStatusTip(tr("撤销"));
     connect(undoAction, &QAction::triggered,
             textEdit, &TextEditor::undo);
@@ -250,6 +257,7 @@ void MainWindow::createActions()
     redoAction = new QAction(tr("恢复(&R)"), this);
     redoAction->setIcon(QIcon(":/images/redo.png"));
     redoAction->setShortcut(QKeySequence::Redo);
+    redoAction->setToolTip(tr("恢复"));
     redoAction->setStatusTip(tr("恢复"));
     connect(redoAction, &QAction::triggered,
             textEdit, &TextEditor::redo);
@@ -260,6 +268,7 @@ void MainWindow::createActions()
     cutAction = new QAction(tr("剪切(&T)"), this);
     cutAction->setIcon(QIcon(":/images/cut.png"));
     cutAction->setShortcut(QKeySequence::Cut);
+    cutAction->setToolTip(tr("剪切文本"));
     cutAction->setStatusTip(tr("剪切文本"));
     cutAction->setEnabled(false);
     connect(cutAction, &QAction::triggered,
@@ -269,6 +278,7 @@ void MainWindow::createActions()
     copyAction = new QAction(tr("复制(&C)"), this);
     copyAction->setIcon(QIcon(":/images/copy.png"));
     copyAction->setShortcut(QKeySequence::Copy);
+    copyAction->setToolTip(tr("复制文本"));
     copyAction->setStatusTip(tr("复制文本"));
     copyAction->setEnabled(false);
     connect(copyAction, &QAction::triggered,
@@ -278,12 +288,14 @@ void MainWindow::createActions()
     pasteAction = new QAction(tr("粘贴(&P)"), this);
     pasteAction->setIcon(QIcon(":/images/paste.png"));
     pasteAction->setShortcut(QKeySequence::Paste);
+    pasteAction->setToolTip(tr("粘贴文本"));
     pasteAction->setStatusTip(tr("粘贴文本"));
     connect(pasteAction, &QAction::triggered,
             textEdit, &TextEditor::paste);
 
     deleteAction = new QAction(tr("删除(&D)"), this);
     deleteAction->setShortcut(QKeySequence::Delete);
+    deleteAction->setToolTip(tr("删除所选文本"));
     deleteAction->setStatusTip(tr("删除所选文本"));
     connect(deleteAction, &QAction::triggered,
             [=]()
@@ -296,32 +308,39 @@ void MainWindow::createActions()
 
     selectAllAction = new QAction(tr("全选(&L)"), this);
     selectAllAction->setShortcut(QKeySequence::SelectAll);
+    selectAllAction->setToolTip(tr("全选文本"));
     selectAllAction->setStatusTip(tr("全选文本"));
     connect(selectAllAction, &QAction::triggered,
             textEdit, &TextEditor::selectAll);
 
     findAction = new QAction(tr("查找(&F)..."), this);
+    findAction->setToolTip(tr("查找文本"));
     findAction->setStatusTip(tr("查找文本"));
     connect(findAction, &QAction::triggered,
             textEdit, &TextEditor::find);
 
     fullScreenAction = new QAction(tr("切换全屏模式"), this);
     fullScreenAction->setShortcut(QKeySequence::FullScreen);
+    fullScreenAction->setToolTip(tr("全屏显示"));
     fullScreenAction->setStatusTip(tr("全屏显示"));
 
     optionAction = new QAction(tr("首选项..."), this);
+    optionAction->setToolTip(tr("配置程序"));
     optionAction->setStatusTip(tr("配置程序"));
 
     generateMD5Action = new QAction(tr("生成..."), this);
+    generateMD5Action->setToolTip(tr("MD5校验生成工具"));
     generateMD5Action->setStatusTip(tr("MD5校验生成工具"));
     connect(generateMD5Action, &QAction::triggered, this, &MainWindow::MD5WidgetShow);
 
     updateAction = new QAction(tr("升级 TextEditor"), this);
+    updateAction->setToolTip(tr("升级应用程序"));
     updateAction->setStatusTip(tr("升级应用程序"));
     connect(updateAction, &QAction::triggered,
             this, &MainWindow::updateApp);
 
     aboutAction = new QAction(tr("关于 TextEditor..."), this);
+    aboutAction->setToolTip(tr("显示应用的相关信息"));
     aboutAction->setStatusTip(tr("显示应用的相关信息"));
     connect(aboutAction, &QAction::triggered,
             this, &MainWindow::about);
@@ -411,8 +430,14 @@ void MainWindow::createToolBars()
 void MainWindow::createStatusBar()
 {
     showLabel = new QLabel(tr("Normal text file"));
-    showLabel->setAlignment(Qt::AlignLeft);
+    showLabel->setAlignment(Qt::AlignRight);
     showLabel->setMinimumSize(showLabel->sizeHint());
+    // showLabel->setMargin(2); // 设定边距
+    showLabel->setIndent(50);   // 设定间距
+
+    rowColumnLabel = new QLabel(tr("Ln : 1   Col : 0"));
+    rowColumnLabel->setAlignment(Qt::AlignLeft);
+    rowColumnLabel->setMinimumSize(rowColumnLabel->sizeHint());
 
     insertModeLabel = new QLabel(tr("INS"));
 //    if(textEdit->overwriteMode())
@@ -427,6 +452,8 @@ void MainWindow::createStatusBar()
     insertModeLabel->setMinimumSize(insertModeLabel->sizeHint());
 
     statusBar()->addWidget(showLabel);
+    // rowcol | insertMode
+    statusBar()->addPermanentWidget(rowColumnLabel);
     statusBar()->addPermanentWidget(insertModeLabel);
 }
 
@@ -625,7 +652,7 @@ void MainWindow::showCursorPosition()
 {
     int row = textEdit->document()->blockCount();
     int col = textEdit->textCursor().columnNumber();
-    showLabel->setText(tr("Ln : %1   Col : %2").arg(row).arg(col));
+    rowColumnLabel->setText(tr("Ln : %1   Col : %2").arg(row).arg(col));
 }
 
 
