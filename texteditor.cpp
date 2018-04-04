@@ -3,7 +3,9 @@
 #include <QFile>
 #include <QTextStream>
 #include <QKeyEvent>
+#include <QTextCodec>
 
+#include "myheaders.h"
 #include "texteditor.h"
 
 TextEditor::TextEditor(QWidget* parent):QTextEdit(parent)
@@ -23,12 +25,31 @@ bool TextEditor::readFile(const QString &fileName)
         return false;
     }
 
-    QTextStream in(&file);
+    //QTextStream inFile(&file);
 #ifndef QT_NO_CURSOR
     QApplication::setOverrideCursor(Qt::WaitCursor);
 #endif
 
-    setPlainText(in.readAll());
+    const QByteArray data = file.readAll();
+    QTextCodec::ConverterState state;
+    QTextCodec *codec = QTextCodec::codecForName("UTF-8");
+    const QString text = codec->toUnicode(data.constData(), data.size(), &state);
+    qcout << text;
+    if (state.invalidChars > 0)
+    {
+        // Not a UTF-8 text - using system default locale
+        QTextCodec * codec1 = QTextCodec::codecForLocale();
+        qcout << codec1->name();
+        if (!codec1)
+            return false;
+        qcout << "invalidChars > 0";
+        setPlainText(codec1->toUnicode(data));
+    }
+    else
+    {
+        qcout << "invalidChars = 0";
+        setPlainText(text);
+    }
 
 #ifndef QT_NO_CURSOR
     QApplication::restoreOverrideCursor();
@@ -49,6 +70,7 @@ bool TextEditor::writeFile(const QString &fileName)
     }
 
     QTextStream out(&file);
+    out.setCodec("UTF-8");
 #ifndef QT_NO_CURSOR
     QApplication::setOverrideCursor(Qt::WaitCursor);
 #endif

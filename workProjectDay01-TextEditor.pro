@@ -32,7 +32,8 @@ SOURCES += \
 HEADERS += \
         texteditor.h \
     mainwindow.h \
-    md5widget.h
+    md5widget.h \
+    myheaders.h
 
 RESOURCES += \
     texteditor.qrc

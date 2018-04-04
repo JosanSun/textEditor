@@ -435,7 +435,7 @@ void MainWindow::createStatusBar()
     // showLabel->setMargin(2); // 设定边距
     showLabel->setIndent(50);   // 设定间距
 
-    rowColumnLabel = new QLabel(tr("Ln : 1   Col : 0"));
+    rowColumnLabel = new QLabel(tr("Ln : 1   Col : 1"));
     rowColumnLabel->setAlignment(Qt::AlignLeft);
     rowColumnLabel->setMinimumSize(rowColumnLabel->sizeHint());
 
@@ -650,8 +650,8 @@ void MainWindow::onResultUpdate(QNetworkReply* reply)
 // 显示当前光标所在的行列号
 void MainWindow::showCursorPosition()
 {
-    int row = textEdit->document()->blockCount();
-    int col = textEdit->textCursor().columnNumber();
+    int row = textEdit->textCursor().blockNumber() + 1;
+    int col = textEdit->textCursor().columnNumber() + 1;
     rowColumnLabel->setText(tr("Ln : %1   Col : %2").arg(row).arg(col));
 }
 
