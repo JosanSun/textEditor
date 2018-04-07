@@ -1,7 +1,23 @@
 # Change Log
 # All notable changes to this project will be documented in this file.
 
-## [2.2]
+## [2.2.1]  2018-04-07
+### Added
+- 增加查找功能 可支持大小写识别，前后查找，中英文查找
+### Changed
+- 将除了主界面的textEdit,其他小控件窗口统一放在my_plug-in文件夹下面
+### BUG
+- 保存文档的时候, 将统一转换为ANSI编码(默认)或者UTF-8编码, 无法按照原来的编码方式保存文档. 
+- Overwrite模式下面, 只对英文有效, 对于汉字没有效果
+### ToDoList
+- 打开大文件的瓶颈在setPlainText()函数，而不是readAll(). readAll()可以正常读取600MB大小的文件，6GB会出错。但是setPlainText()读取60MB的文件，就很卡。
+- 增加状态栏编码方式的显示
+- 将单文档程序改为多文档程序
+- 增加文档前面行号的显示             -- 目前想法，左边加一个QWidget
+- 增加文件拖放打开功能
+
+
+## [2.2]  2018-04-04
 ### Fixed
 - 修复原来显示行列号, 行数为总行数, 而不是当前光标所在行数的问题
 - 修复了原来无法打开含有中文字符的UTF-8文档. 现在可以正常ANSI, 以及Unicode所编写的文档

@@ -4,8 +4,9 @@
 #include <QTextStream>
 #include <QKeyEvent>
 #include <QTextCodec>
+#include <QTime>
 
-#include "myheaders.h"
+#include "my_plug-in/myheaders.h"
 #include "texteditor.h"
 
 TextEditor::TextEditor(QWidget* parent):QTextEdit(parent)
@@ -29,12 +30,17 @@ bool TextEditor::readFile(const QString &fileName)
 #ifndef QT_NO_CURSOR
     QApplication::setOverrideCursor(Qt::WaitCursor);
 #endif
-
+    QTime t1, t2, t3, t4;
+    t1 = QTime::currentTime();
     const QByteArray data = file.readAll();
+    t2 = QTime::currentTime();
+    qcout << t1.msecsTo(t2);
     QTextCodec::ConverterState state;
     QTextCodec *codec = QTextCodec::codecForName("UTF-8");
     const QString text = codec->toUnicode(data.constData(), data.size(), &state);
-    qcout << text;
+    //qcout << text;
+    t3 = QTime::currentTime();
+    qcout << t2.msecsTo(t3);
     if (state.invalidChars > 0)
     {
         // Not a UTF-8 text - using system default locale
@@ -50,7 +56,8 @@ bool TextEditor::readFile(const QString &fileName)
         qcout << "invalidChars = 0";
         setPlainText(text);
     }
-
+    t4 = QTime::currentTime();
+    qcout << t3.msecsTo(t4);
 #ifndef QT_NO_CURSOR
     QApplication::restoreOverrideCursor();
 #endif
@@ -96,7 +103,32 @@ void TextEditor::keyPressEvent(QKeyEvent *ev)
 }
 
 
-void TextEditor::find()
+void TextEditor::findNext(const QString &str, Qt::CaseSensitivity cs)
 {
+    QTextDocument::FindFlags flag;
+    flag = ((cs == Qt::CaseSensitive)? QTextDocument::FindCaseSensitively : flag);
 
+    if(!find(str, flag))
+    {
+        QMessageBox::warning(this, tr("查找失败"),
+                             tr("没有查找到: %1 .").arg(str), QMessageBox::Ok,
+                             QMessageBox::NoButton);
+    }
+}
+
+void TextEditor::findPrevious(const QString &str, Qt::CaseSensitivity cs)
+{
+    QTextDocument::FindFlags flag = QTextDocument::FindBackward;
+
+    if(cs == Qt::CaseSensitive)
+    {
+        flag = flag | QTextDocument::FindCaseSensitively;
+    }
+
+    if(!find(str, flag))
+    {
+        QMessageBox::warning(this, tr("查找失败"),
+                             tr("没有查找到%1.").arg(str), QMessageBox::Ok,
+                             QMessageBox::NoButton);
+    }
 }

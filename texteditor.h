@@ -18,7 +18,8 @@ protected:
     void keyPressEvent(QKeyEvent* ev);
 
 public slots:
-    void find();
+    void findNext(const QString& str, Qt::CaseSensitivity cs);
+    void findPrevious(const QString& str, Qt::CaseSensitivity cs);
 };
 
 #endif // MAINWINDOW_H

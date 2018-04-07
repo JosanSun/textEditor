@@ -27,13 +27,15 @@ SOURCES += \
         main.cpp \
         texteditor.cpp \
     mainwindow.cpp \
-    md5widget.cpp
+    my_plug-in/md5widget.cpp \
+    my_plug-in/finddialog.cpp
 
 HEADERS += \
         texteditor.h \
     mainwindow.h \
-    md5widget.h \
-    myheaders.h
+    my_plug-in/md5widget.h \
+    my_plug-in/myheaders.h \
+    my_plug-in/finddialog.h
 
 RESOURCES += \
     texteditor.qrc

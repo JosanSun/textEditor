@@ -314,10 +314,12 @@ void MainWindow::createActions()
             textEdit, &TextEditor::selectAll);
 
     findAction = new QAction(tr("查找(&F)..."), this);
+    findAction->setIcon(QIcon(":/images/find.png"));
+    findAction->setShortcut(QKeySequence::Find);
     findAction->setToolTip(tr("查找文本"));
     findAction->setStatusTip(tr("查找文本"));
     connect(findAction, &QAction::triggered,
-            textEdit, &TextEditor::find);
+            this, &MainWindow::find);
 
     fullScreenAction = new QAction(tr("切换全屏模式"), this);
     fullScreenAction->setShortcut(QKeySequence::FullScreen);
@@ -411,20 +413,20 @@ void MainWindow::createContextMenu()
 
 void MainWindow::createToolBars()
 {
-    fileToolBar = addToolBar(tr("&File"));
-    fileToolBar->addAction(newAction);
-    fileToolBar->addAction(openAction);
-    fileToolBar->addAction(saveAction);
-    fileToolBar->addAction(printAction);
-
-    editToolBar = addToolBar(tr("&Edit"));
-    editToolBar->addAction(undoAction);
-    editToolBar->addAction(redoAction);
-    editToolBar->addSeparator();
-    editToolBar->addAction(cutAction);
-    editToolBar->addAction(copyAction);
-    editToolBar->addAction(pasteAction);
-
+    mainToolBar = addToolBar(tr("main"));
+    mainToolBar->addAction(newAction);
+    mainToolBar->addAction(openAction);
+    mainToolBar->addAction(saveAction);
+    mainToolBar->addAction(printAction);
+    mainToolBar->addSeparator();
+    mainToolBar->addAction(cutAction);
+    mainToolBar->addAction(copyAction);
+    mainToolBar->addAction(pasteAction);
+    mainToolBar->addSeparator();
+    mainToolBar->addAction(undoAction);
+    mainToolBar->addAction(redoAction);
+    mainToolBar->addSeparator();
+    mainToolBar->addAction(findAction);
 }
 
 void MainWindow::createStatusBar()
@@ -594,6 +596,22 @@ void MainWindow::MD5WidgetShow()
     MD5Widget* md5widget = new MD5Widget;
     md5widget->show();
     md5widget->setAttribute(Qt::WA_DeleteOnClose);   // 防止内存泄漏
+}
+
+void MainWindow::find()
+{
+    if(!findDialog)
+    {
+        findDialog = new FindDialog(this);
+        connect(findDialog, &FindDialog::findNext,
+                textEdit, &TextEditor::findNext);
+        connect(findDialog, &FindDialog::findPrevious,
+                textEdit, &TextEditor::findPrevious);
+    }
+
+    findDialog->show();
+    findDialog->raise();
+    findDialog->activateWindow();
 }
 
 void MainWindow::updateApp()
