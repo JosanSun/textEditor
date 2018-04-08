@@ -335,6 +335,11 @@ void MainWindow::createActions()
     generateMD5Action->setStatusTip(tr("MD5校验生成工具"));
     connect(generateMD5Action, &QAction::triggered, this, &MainWindow::MD5WidgetShow);
 
+    generateMD5FileAction = new QAction(tr("从文件生成..."), this);
+    generateMD5FileAction->setToolTip(tr("从文件中生成MD5值"));
+    generateMD5FileAction->setStatusTip(tr("从文件中生成MD5值"));
+    connect(generateMD5FileAction, &QAction::triggered, this, &MainWindow::MD5FileWidgetShow);
+
     updateAction = new QAction(tr("升级 TextEditor"), this);
     updateAction->setToolTip(tr("升级应用程序"));
     updateAction->setStatusTip(tr("升级应用程序"));
@@ -394,6 +399,7 @@ void MainWindow::createMenus()
     md5Menu = new QMenu(tr("MD5"));
     toolsMenu->addMenu(md5Menu);
     md5Menu->addAction(generateMD5Action);
+    md5Menu->addAction(generateMD5FileAction);
 
     // 帮助菜单
     helpMenu = menuBar()->addMenu(tr("帮助(&H)"));
@@ -593,9 +599,20 @@ void MainWindow::updateRecentFileActions()
 
 void MainWindow::MD5WidgetShow()
 {
-    MD5Widget* md5widget = new MD5Widget;
-    md5widget->show();
-    md5widget->setAttribute(Qt::WA_DeleteOnClose);   // 防止内存泄漏
+    md5Widget = new MD5Widget;
+    md5Widget->setAttribute(Qt::WA_DeleteOnClose);
+    md5Widget->show();
+    md5Widget->raise();
+    md5Widget->activateWindow();
+}
+
+void MainWindow::MD5FileWidgetShow()
+{
+    md5FileWidget = new MD5FileWidget;
+    md5FileWidget->setAttribute(Qt::WA_DeleteOnClose);
+    md5FileWidget->show();
+    md5FileWidget->raise();
+    md5FileWidget->activateWindow();
 }
 
 void MainWindow::find()

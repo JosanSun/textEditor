@@ -21,12 +21,12 @@ FindDialog::FindDialog(QWidget* parent):QDialog(parent)
     findButton->setEnabled(false);
     closeButton = new QPushButton(tr("Close"));
 
-    connect(lineEdit, QLineEdit::textChanged,
-            this, FindDialog::enableFindButton);
-    connect(findButton, QPushButton::clicked,
-            this, FindDialog::findClicked);
-    connect(closeButton, QPushButton::clicked,
-            this, FindDialog::close);
+    connect(lineEdit, &QLineEdit::textChanged,
+            this, &FindDialog::enableFindButton);
+    connect(findButton, &QPushButton::clicked,
+            this, &FindDialog::findClicked);
+    connect(closeButton, &QPushButton::clicked,
+            this, &FindDialog::close);
 
     QHBoxLayout* topLeftLayout = new QHBoxLayout;
     topLeftLayout->addWidget(label);
@@ -72,7 +72,10 @@ void FindDialog::findClicked()
     }
 }
 
+// 这种写法需要学习一下
 void FindDialog::enableFindButton(const QString &text)
 {
     findButton->setEnabled(!text.isEmpty());
+    // 对比
+    // findButton->setEnabled(true);
 }

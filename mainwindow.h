@@ -4,8 +4,9 @@
 #include <QMainWindow>
 #include <QtNetwork>
 #include "texteditor.h"
-#include "my_plug-in/md5widget.h"
 #include "my_plug-in/finddialog.h"
+#include "my_plug-in/md5widget.h"
+#include "my_plug-in/md5filewidget.h"
 
 QT_BEGIN_NAMESPACE
 class QAction;
@@ -55,6 +56,7 @@ private slots:
     void textEditorModified();
     void openRecentFile();
     void MD5WidgetShow();
+    void MD5FileWidgetShow();
 
     void find();
 
@@ -63,16 +65,17 @@ private slots:
 
     void showCursorPosition();
 
-
-
 private:
     // 当前文件名
     QString curFile;            // 带有路径的文件名 eg：C:\test\test.txt
     QStringList recentFiles;    // recentFiles文件名存储格式与curFile一致
     // 主编辑界面
-    TextEditor* textEdit    = nullptr;
+    TextEditor* textEdit         = nullptr;
     // 查找对话框
-    FindDialog* findDialog  = nullptr;
+    FindDialog* findDialog       = nullptr;
+    MD5Widget* md5Widget         = nullptr;
+    MD5FileWidget* md5FileWidget = nullptr;
+
     // 状态栏的3个显示标签
     QLabel* showLabel       = nullptr;
     QLabel* rowColumnLabel  = nullptr;
@@ -113,6 +116,7 @@ private:
     QAction* fullScreenAction  = nullptr;
     QAction* optionAction      = nullptr;
     QAction* generateMD5Action = nullptr;
+    QAction* generateMD5FileAction = nullptr;
     QAction* updateAction      = nullptr;
     QAction* aboutAction       = nullptr;
 

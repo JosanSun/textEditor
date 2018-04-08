@@ -28,18 +28,23 @@ SOURCES += \
         texteditor.cpp \
     mainwindow.cpp \
     my_plug-in/md5widget.cpp \
-    my_plug-in/finddialog.cpp
+    my_plug-in/finddialog.cpp \
+    my_plug-in/md5filewidget.cpp
 
 HEADERS += \
         texteditor.h \
     mainwindow.h \
     my_plug-in/md5widget.h \
     my_plug-in/myheaders.h \
-    my_plug-in/finddialog.h
+    my_plug-in/finddialog.h \
+    my_plug-in/md5filewidget.h
 
+FORMS += \
+    my_plug-in/md5filewidget.ui
+		
 RESOURCES += \
     texteditor.qrc
-
+	
 DEFINES += "VERSION=2.2"
-
+	
 CONFIG += c++11

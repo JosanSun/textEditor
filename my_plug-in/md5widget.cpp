@@ -39,6 +39,7 @@ MD5Widget::MD5Widget(QWidget *parent) : QWidget(parent)
     // outputBox->setFrameShadow(QFrame::Sunken);
     // outputBox->setReadOnly(true);                // Q: 如何让输出窗口变得暗淡？
     // outputBox->setForegroundRole(QPalette::NoRole);
+    outputBox->setEnabled(false);                   // 让输出窗口变灰
     gridLayout->addWidget(outputBox, 1, 0, 1, 1);
     copyButton = new QPushButton(widget);
     copyButton->setObjectName(QStringLiteral("copyButton"));
@@ -60,11 +61,15 @@ MD5Widget::MD5Widget(QWidget *parent) : QWidget(parent)
 
     mainLayout->addWidget(widget);
     mainLayout->addWidget(widget_2);
+    this->setLayout(mainLayout);
 
+    // 去除最大最小化按钮
+    setWindowFlags(windowFlags() & ~Qt::WindowMinMaxButtonsHint);
     this->setWindowTitle(tr("生成MD5值"));
     copyButton->setText(tr("复制到剪贴板"));
     closeButton->setText(tr("关闭"));
     splitEachRowBox->setText(tr("按行分别生成"));
+
 
     connect(closeButton, &QPushButton::clicked, this, &MD5Widget::close);
     connect(inputBox, &QPlainTextEdit::textChanged, this, &MD5Widget::generateMD5);
