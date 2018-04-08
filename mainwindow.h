@@ -41,10 +41,8 @@ private:
     void writeSettings();
     bool okToContinue();
     void setCurrentFile(const QString& fileName);
-    // bool loadFile(const QString& fileName);
     bool saveFile(const QString& fileName);
     void updateRecentFileActions();
-    QString strippedName(const QString& fileName);
 
 private slots:
     void newFile();
@@ -57,9 +55,8 @@ private slots:
     void openRecentFile();
     void MD5WidgetShow();
     void MD5FileWidgetShow();
-
     void find();
-
+    void setFullScreen();
     void updateApp();
     void onResultUpdate(QNetworkReply*);
 

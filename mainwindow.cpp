@@ -149,6 +149,24 @@ void MainWindow::printFile()
 
 }
 
+void MainWindow::setFullScreen()
+{
+    if(isFullScreen())
+    {
+        //menuBar()->show();
+        mainToolBar->show();
+        statusBar()->show();
+        this->setWindowState(Qt::WindowMaximized);
+    }
+    else
+    {
+        //menuBar()->hide();   // ??? menuBar()->hide可以隐藏，但是想显示却无法显示出来。不知为什么，跟statusBar()还有区别.
+        mainToolBar->hide();
+        statusBar()->hide();
+        this->setWindowState(Qt::WindowFullScreen);
+    }
+}
+
 void MainWindow::about()
 {
     QMessageBox::about(this, tr("关于 <b>TextEditor</b>"),
@@ -325,6 +343,8 @@ void MainWindow::createActions()
     fullScreenAction->setShortcut(QKeySequence::FullScreen);
     fullScreenAction->setToolTip(tr("全屏显示"));
     fullScreenAction->setStatusTip(tr("全屏显示"));
+    connect(fullScreenAction, &QAction::triggered,
+            this, &MainWindow::setFullScreen);
 
     optionAction = new QAction(tr("首选项..."), this);
     optionAction->setToolTip(tr("配置程序"));
