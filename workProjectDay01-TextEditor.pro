@@ -48,6 +48,6 @@ FORMS += \
 RESOURCES += \
     texteditor.qrc
 	
-DEFINES += "VERSION=2.2"
+# DEFINES += "VERSION=3.0"
 	
 CONFIG += c++11

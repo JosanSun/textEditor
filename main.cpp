@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationName("Southeast University");
     QCoreApplication::setApplicationName("TextEditor");
     QCoreApplication::setApplicationVersion(QT_VERSION_STR);
-    QCoreApplication::setApplicationVersion("2.0");
+    QCoreApplication::setApplicationVersion("3.0");
 
     // 增加命令行的支持
     QCommandLineParser parser;

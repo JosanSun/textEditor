@@ -222,12 +222,16 @@ void MainWindow::setFullScreen()
 
 void MainWindow::about()
 {
-    QMessageBox::about(this, tr("关于 <b>TextEditor</b>"),
-            tr("<h2>TextEditor 2.0</h2>"
+    QMessageBox::about(this, tr("关于 TextEditor"),
+            tr("<h2>TextEditor v%1</h2>"
                "<p>Copyright &copy; 2018 SouthEast University."
-               "<p><b>TextEditor</b>是一个用来展示QAction, QMainWindow, QMenuBar, "
-               "QStatusBar, QTableWidget, QToolBar以及其他Qt类用法."
-               "<p>本软件仅用来交流讨论，有任何好的建议欢迎联系QQ:1030460698."));
+               "<p>"
+               "<p>项目原地址： https://github.com/JosanSun/textEditor"
+               "<p>"
+               "<p><b>TextEditor</b>是主要用来展示QAction, QMainWindow, QMenuBar, "
+               "QStatusBar, QTableWidget, QToolBar以及其他Qt类的常用用法."
+               "<p>本软件仅用来交流讨论，有任何好的建议欢迎联系QQ:1030460698.")
+                       .arg(QCoreApplication::applicationVersion()));
 }
 
 void MainWindow::textEditorModified()
@@ -742,55 +746,56 @@ void MainWindow::find()
     findDialog->activateWindow();
 }
 
+// TESTING
 void MainWindow::updateApp()
 {
-    QNetworkAccessManager networkManager;
+//    QNetworkAccessManager networkManager;
 
-    QUrl url("https://api.github.com/repos/JosanSun/textEditor/releases/latest");
-    // The current all existing releases are all pre-release
-    // So the json file is unavailable
-    QNetworkRequest request;
-    request.setUrl(url);
+//    QUrl url("https://api.github.com/repos/JosanSun/textEditor/releases/latest");
+//    // The current all existing releases are all pre-release
+//    // So the json file is unavailable
+//    QNetworkRequest request;
+//    request.setUrl(url);
 
-    currentReply = networkManager.get(request);  // GET
-    connect(&networkManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(onResultUpdate(QNetworkReply*)));
-    QEventLoop eventLoop;
-    QObject::connect(&networkManager, &QNetworkAccessManager::finished, &eventLoop, &QEventLoop::quit);
-    eventLoop.exec();
+//    currentReply = networkManager.get(request);  // GET
+//    connect(&networkManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(onResultUpdate(QNetworkReply*)));
+//    QEventLoop eventLoop;
+//    QObject::connect(&networkManager, &QNetworkAccessManager::finished, &eventLoop, &QEventLoop::quit);
+//    eventLoop.exec();
 }
 
 
 void MainWindow::onResultUpdate(QNetworkReply* reply)
 {
-    if (currentReply->error() != QNetworkReply::NoError)
-    {
-        //qDebug()<<"ERROR!";
-        return;  // ...only in a blog post
-    }
+//    if (currentReply->error() != QNetworkReply::NoError)
+//    {
+//        //qDebug()<<"ERROR!";
+//        return;  // ...only in a blog post
+//    }
 
-    QString data = (QString) reply->readAll();
-    //qDebug()<<data;
-    QJsonDocument d = QJsonDocument::fromJson(data.toUtf8());
-    QJsonObject sett2 = d.object();
-    QJsonValue value = sett2.value(QString("tag_name"));
-    //qDebug() << value;
+//    QString data = (QString) reply->readAll();
+//    //qDebug()<<data;
+//    QJsonDocument d = QJsonDocument::fromJson(data.toUtf8());
+//    QJsonObject sett2 = d.object();
+//    QJsonValue value = sett2.value(QString("tag_name"));
+//    //qDebug() << value;
 
-    if(value.toDouble() > VERSION)
-    {
-        QMessageBox::StandardButton button;
-        button = QMessageBox::question(this, tr("有新的版本"),
-                QString(tr("是否下载新的版本？")),
-                QMessageBox::Yes | QMessageBox::No);
+//    if(value.toDouble() > VERSION)
+//    {
+//        QMessageBox::StandardButton button;
+//        button = QMessageBox::question(this, tr("有新的版本"),
+//                QString(tr("是否下载新的版本？")),
+//                QMessageBox::Yes | QMessageBox::No);
 
-        if (button == QMessageBox::Yes)
-        {
-             downloadNewApp();
-        }
-    }
-    else
-    {
-        QMessageBox::information(0, "更新检查","此版本已经是最新发布版本", QMessageBox::Yes);
-    }
+//        if (button == QMessageBox::Yes)
+//        {
+//             downloadNewApp();
+//        }
+//    }
+//    else
+//    {
+//        QMessageBox::information(0, "更新检查","此版本已经是最新发布版本", QMessageBox::Yes);
+//    }
 }
 
 // 显示当前光标所在的行列号
