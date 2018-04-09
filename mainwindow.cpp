@@ -117,6 +117,15 @@ void MainWindow::open()
                                                            "C++ source file (*.h;*.hpp;*.hxx;*.cpp;*.cxx;*.cc)"));
         if(!fileName.isEmpty())
         {
+            QFileInfo fileInfo(fileName);
+            // 如果文件的大小超过50MB，则显示无法打开。
+            if(fileInfo.size() > 50 * 1024 * 1024)
+            {
+                QMessageBox::warning(this, tr("文件大小问题"),
+                                     tr("<p>文件太大, Text Editor打不开。"
+                                        "<p>程序员们正在加班加点解决问题^_^"));
+                return ;
+            }
             loadFile(fileName);
         }
     }
