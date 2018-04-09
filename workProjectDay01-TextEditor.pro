@@ -4,7 +4,10 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network printsupport
+QT       += core gui network
+
+# 如果存在printsupport模块，则增加打印支持模块
+qtHaveModule(printsupport): QT += printsupport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 

@@ -1,4 +1,6 @@
-﻿#include <QAction>
+﻿#include <QMimeData>
+#include <QClipboard>
+#include <QAction>
 #include <QLabel>
 #include <QMenu>
 #include <QMenuBar>
@@ -13,8 +15,19 @@
 #include <QStringList>
 #include <QDesktopWidget>
 #include <QKeyEvent>
-#include <QPrinter>
+// 增加打印功能支持
+#if defined(QT_PRINTSUPPORT_LIB)
+#include <QtPrintSupport/qtprintsupportglobal.h>
+#if QT_CONFIG(printer)
+#if QT_CONFIG(printdialog)
 #include <QPrintDialog>
+#endif
+#include <QPrinter>
+#if QT_CONFIG(printpreviewdialog)
+#include <QPrintPreviewDialog>
+#endif
+#endif
+#endif
 
 #ifdef _MSC_VER
 #if _MSC_VER >= 1600
@@ -29,6 +42,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     textEdit = new TextEditor(this);
     this->setCentralWidget(textEdit);
+    textEdit->setFocus();
 
     // 创建主界面
     createActions();
@@ -44,6 +58,8 @@ MainWindow::MainWindow(QWidget *parent)
     this->setCurrentFile("");
     //this->resize(500, 300);
     setUnifiedTitleAndToolBarOnMac(true);
+
+
 
     connect(textEdit, &TextEditor::textChanged,
             this, &MainWindow::textEditorModified);
@@ -132,21 +148,58 @@ bool MainWindow::saveAs()
 
 void MainWindow::printFile()
 {
-
+#if QT_CONFIG(printdialog)
     QPrinter printer(QPrinter::HighResolution);
-    textEdit->print(&printer);
-//    QPrintDialog* dlg = new QPrintDialog(&printer, this);
-//    if(textEdit->textCursor().hasSelection())
-//    {
-//        dlg->addEnabledOption(QAbstractPrintDialog::PrintSelection);
-//    }
-//    dlg->setWindowTitle(tr("Print TextEditor Document"));
-//    if(QDialog::Accepted == dlg->exec())
-//    {
-//        textEdit->print(&printer);
-//    }
-//    delete dlg;
+    QPrintDialog *dlg = new QPrintDialog(&printer, this);
+    if (textEdit->textCursor().hasSelection())
+        dlg->addEnabledOption(QAbstractPrintDialog::PrintSelection);
+    dlg->setWindowTitle(tr("打印文档"));
+    if (dlg->exec() == QDialog::Accepted)
+        textEdit->print(&printer);
+    delete dlg;
 
+//    // 部分系统可以简写为
+//    QPrinter printer(QPrinter::HighResolution);
+//    textEdit->print(&printer);
+#endif
+}
+
+void MainWindow::printFilePreview()
+{
+#if QT_CONFIG(printpreviewdialog)
+    QPrinter printer(QPrinter::HighResolution);
+    QPrintPreviewDialog preview(&printer, this);
+    connect(&preview, &QPrintPreviewDialog::paintRequested, this, &MainWindow::printPreview);
+    preview.exec();
+#endif
+}
+
+void MainWindow::printPreview(QPrinter *printer)
+{
+#ifdef QT_NO_PRINTER
+    Q_UNUSED(printer);
+#else
+    textEdit->print(printer);
+#endif
+}
+
+void MainWindow::printFilePDF()
+{
+#ifndef QT_NO_PRINTER
+    QFileDialog fileDialog(this, tr("导出PDF文件..."));
+    fileDialog.setAcceptMode(QFileDialog::AcceptSave);
+    fileDialog.setMimeTypeFilters(QStringList("application/pdf"));
+    fileDialog.setDefaultSuffix("pdf");
+    if (fileDialog.exec() != QDialog::Accepted)
+        return;
+    QString fileName = fileDialog.selectedFiles().first();
+    QPrinter printer(QPrinter::HighResolution);
+    printer.setOutputFormat(QPrinter::PdfFormat);
+    printer.setOutputFileName(fileName);
+    textEdit->document()->print(&printer);
+    statusBar()->showMessage(tr("Exported \"%1\"")
+                             .arg(QDir::toNativeSeparators(fileName)));
+#endif
 }
 
 void MainWindow::setFullScreen()
@@ -180,6 +233,14 @@ void MainWindow::about()
 void MainWindow::textEditorModified()
 {
     setWindowModified(true);
+}
+
+void MainWindow::clipboardDataChanged()
+{
+    if (const QMimeData *md = QApplication::clipboard()->mimeData())
+    {
+        pasteAction->setEnabled(md->hasText());
+    }
 }
 
 void MainWindow::openRecentFile()
@@ -221,12 +282,17 @@ void MainWindow::createActions()
     saveAction->setStatusTip("保存文件");
     connect(saveAction, &QAction::triggered,
             this, &MainWindow::save);
-    connect(textEdit, &TextEditor::textChanged,
-            [this]()
-    {
-        this->saveAction->setEnabled(true);
-    });
-    saveAction->setEnabled(false);
+    // 比较好的按钮同步方法   BUG：为什么保存文件之后，saveAction仍然高亮？按代码逻辑的话，应该disable
+    connect(textEdit, &TextEditor::modificationChanged,
+            saveAction, &QAction::setEnabled);
+    saveAction->setEnabled(textEdit->document()->isModified());
+    // 注意对比上面的方法  此处的方法存在一个明显的BUG：就是文档保存之后，保存按钮依然高亮，不符合用户习惯
+//    connect(textEdit, &TextEditor::textChanged,
+//            [this]()
+//    {
+//        this->saveAction->setEnabled(true);
+//    });
+//    saveAction->setEnabled(false);
 
     saveAsAction = new QAction(tr("另存为(&A)..."), this);
     saveAsAction->setShortcut(tr("Ctrl+Alt+S"));
@@ -243,6 +309,19 @@ void MainWindow::createActions()
     printAction->setStatusTip(tr("打印文档"));
     connect(printAction, &QAction::triggered,
             this, &MainWindow::printFile);
+
+    printPreviewAction = new QAction(tr("打印预览..."), this);
+    printPreviewAction->setToolTip(tr("打印预览"));
+    printPreviewAction->setStatusTip(tr("打印预览"));
+    connect(printPreviewAction, &QAction::triggered,
+            this, &MainWindow::printFilePreview);
+
+    exportToPDFAction = new QAction(tr("导出至PDF..."), this);
+    exportToPDFAction->setIcon(QIcon(":/images/exportpdf.png"));
+    exportToPDFAction->setToolTip(tr("导出至PDF"));
+    exportToPDFAction->setStatusTip(tr("导出至PDF"));
+    connect(exportToPDFAction, &QAction::triggered,
+            this, &MainWindow::printFilePDF);
 
     // 文件菜单 --> 最近打开文件
     for(int i = 0; i < MaxRecentFiles; ++i)
@@ -269,8 +348,9 @@ void MainWindow::createActions()
             textEdit, &TextEditor::undo);
     connect(textEdit, &TextEditor::undoAvailable,
             undoAction, &QAction::setEnabled);
+    undoAction->setEnabled(textEdit->document()->isUndoAvailable());
     // 设定初始状态，注意与【复制】，【剪切】等动作的区别
-    undoAction->setEnabled(false);
+    // undoAction->setEnabled(false);
 
     redoAction = new QAction(tr("恢复(&R)"), this);
     redoAction->setIcon(QIcon(":/images/redo.png"));
@@ -281,7 +361,8 @@ void MainWindow::createActions()
             textEdit, &TextEditor::redo);
     connect(textEdit, &TextEditor::redoAvailable,
             redoAction, &QAction::setEnabled);
-    redoAction->setEnabled(false);
+    redoAction->setEnabled(textEdit->document()->isRedoAvailable());
+    // redoAction->setEnabled(false);
 
     cutAction = new QAction(tr("剪切(&T)"), this);
     cutAction->setIcon(QIcon(":/images/cut.png"));
@@ -310,6 +391,14 @@ void MainWindow::createActions()
     pasteAction->setStatusTip(tr("粘贴文本"));
     connect(pasteAction, &QAction::triggered,
             textEdit, &TextEditor::paste);
+    // 绑定
+    connect(QApplication::clipboard(), &QClipboard::dataChanged,
+            this, &MainWindow::clipboardDataChanged);
+    // 初始化
+    if(const QMimeData* md = QApplication::clipboard()->mimeData())
+    {
+        pasteAction->setEnabled(md->hasText());
+    }
 
     deleteAction = new QAction(tr("删除(&D)"), this);
     deleteAction->setShortcut(QKeySequence::Delete);
@@ -383,6 +472,8 @@ void MainWindow::createMenus()
     fileMenu->addAction(saveAsAction);
     fileMenu->addSeparator();
     fileMenu->addAction(printAction);
+    fileMenu->addAction(printPreviewAction);
+    fileMenu->addAction(exportToPDFAction);
     separatorAction = fileMenu->addSeparator();
     for(int i = 0; i < MaxRecentFiles; ++i)
     {

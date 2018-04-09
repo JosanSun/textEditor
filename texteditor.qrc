@@ -13,5 +13,6 @@
         <file>images/redo.png</file>
         <file>images/undo.png</file>
         <file>images/print.png</file>
+        <file>images/exportpdf.png</file>
     </qresource>
 </RCC>

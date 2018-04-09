@@ -12,6 +12,9 @@
 TextEditor::TextEditor(QWidget* parent):QTextEdit(parent)
 {
     clear();
+
+    connect(this->document(), &QTextDocument::modificationChanged,
+            this, &TextEditor::signalTextModification);
 }
 
 bool TextEditor::readFile(const QString &fileName)
@@ -131,4 +134,9 @@ void TextEditor::findPrevious(const QString &str, Qt::CaseSensitivity cs)
                              tr("没有查找到%1.").arg(str), QMessageBox::Ok,
                              QMessageBox::NoButton);
     }
+}
+
+void TextEditor::signalTextModification(bool changed)
+{
+    emit modificationChanged(changed);
 }

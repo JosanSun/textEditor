@@ -16,6 +16,7 @@ class QToolBar;
 class QTextEdit;
 class QCloseEvent;
 class FindDialog;
+class QPrinter;
 QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow
@@ -50,8 +51,12 @@ private slots:
     bool save();
     bool saveAs();
     void printFile();
+    void printFilePreview();
+    void printPreview(QPrinter *printer);
+    void printFilePDF();
     void about();
     void textEditorModified();
+    void clipboardDataChanged();
     void openRecentFile();
     void MD5WidgetShow();
     void MD5FileWidgetShow();
@@ -59,7 +64,6 @@ private slots:
     void setFullScreen();
     void updateApp();
     void onResultUpdate(QNetworkReply*);
-
     void showCursorPosition();
 
 private:
@@ -93,11 +97,13 @@ private:
     //QToolBar* editToolBar;
 
     // 各类菜单项
-    QAction* newAction    = nullptr;
-    QAction* openAction   = nullptr;
-    QAction* saveAction   = nullptr;
-    QAction* saveAsAction = nullptr;
-    QAction* printAction  = nullptr;
+    QAction* newAction          = nullptr;
+    QAction* openAction         = nullptr;
+    QAction* saveAction         = nullptr;
+    QAction* saveAsAction       = nullptr;
+    QAction* printAction        = nullptr;
+    QAction* printPreviewAction = nullptr;
+    QAction* exportToPDFAction  = nullptr;
     enum{ MaxRecentFiles = 5 };
     QAction* recentFileActions[MaxRecentFiles];
     QAction* separatorAction   = nullptr;        // 用于最近打开文件菜单项的分隔
