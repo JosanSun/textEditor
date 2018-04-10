@@ -43,6 +43,8 @@ MainWindow::MainWindow(QWidget *parent)
     textEdit = new TextEditor(this);
     this->setCentralWidget(textEdit);
     textEdit->setFocus();
+    textEdit->setAcceptDrops(false);
+    setAcceptDrops(true);
 
     // 创建主界面
     createActions();
@@ -98,6 +100,34 @@ void MainWindow::closeEvent(QCloseEvent *event)
     }
 }
 
+void MainWindow::dragEnterEvent(QDragEnterEvent *event)
+{
+    if(event->mimeData()->hasUrls())
+    {
+        event->acceptProposedAction();
+    }
+}
+
+void MainWindow::dropEvent(QDropEvent *event)
+{
+    QList<QUrl> urls = event->mimeData()->urls();
+    if(urls.isEmpty())
+    {
+        return ;
+    }
+
+    QString filePath = urls.first().toLocalFile();
+    if(filePath.isEmpty())
+    {
+        return ;
+    }
+
+    if(okToContinue())
+    {
+        loadFile(filePath);
+    }
+}
+
 void MainWindow::newFile()
 {
     if(okToContinue())
@@ -117,15 +147,6 @@ void MainWindow::open()
                                                            "C++ source file (*.h;*.hpp;*.hxx;*.cpp;*.cxx;*.cc)"));
         if(!fileName.isEmpty())
         {
-            QFileInfo fileInfo(fileName);
-            // 如果文件的大小超过50MB，则显示无法打开。
-            if(fileInfo.size() > 50 * 1024 * 1024)
-            {
-                QMessageBox::warning(this, tr("文件大小问题"),
-                                     tr("<p>文件太大, Text Editor打不开。"
-                                        "<p>程序员们正在加班加点解决问题^_^"));
-                return ;
-            }
             loadFile(fileName);
         }
     }
@@ -592,6 +613,10 @@ void MainWindow::createStatusBar()
 void MainWindow::setCurrentFile(const QString &fileName)
 {
     curFile = fileName;
+    if(fileName.isEmpty())
+    {
+        curFile.append("new");
+    }
     setWindowModified(false);
 
     QString shownName = tr("new");
@@ -647,11 +672,20 @@ bool MainWindow::okToContinue()
 {
     if(isWindowModified())
     {
-        int res = QMessageBox::warning(this, tr("TextEditor"),
-                                       tr("The text has been modified.\n"
-                                          "Do you want to save your changes?"),
-                                       QMessageBox::Yes | QMessageBox::No
-                                       | QMessageBox::Cancel);
+        QMessageBox box(QMessageBox::Question, tr("保存"), tr("是否保存文件\"%1\"?").arg(curFile));
+        // 去掉问号！  区分Icon与WindowIcon
+        //box.setIcon(QMessageBox::NoIcon);
+        box.setWindowIcon(QIcon(":/images/fileIcon.png"));
+        box.setStandardButtons(QMessageBox::Ok | QMessageBox::No | QMessageBox::Cancel);
+        box.setButtonText(QMessageBox::Ok, tr("是(&Y)"));
+        box.setButtonText(QMessageBox::No, tr("否(&N)"));
+        box.setButtonText(QMessageBox::Cancel, tr("取消"));
+//        int res = QMessageBox::warning(this, tr("TextEditor"),
+//                                       tr("The text has been modified.\n"
+//                                          "Do you want to save your changes?"),
+//                                       QMessageBox::Yes | QMessageBox::No
+//                                       | QMessageBox::Cancel);
+        int res = box.exec();
         if(res == QMessageBox::Yes)
         {
             return save();
@@ -666,6 +700,16 @@ bool MainWindow::okToContinue()
 
 bool MainWindow::loadFile(const QString &fileName)
 {
+    QFileInfo fileInfo(fileName);
+    // 如果文件的大小超过50MB，则显示无法打开。
+    if(fileInfo.size() > 50 * 1024 * 1024)
+    {
+        QMessageBox::warning(this, tr("文件大小问题"),
+                             tr("<p>文件太大, Text Editor打不开。"
+                                "<p>程序员们正在加班加点解决问题^_^"));
+        return false;
+    }
+
     if(!textEdit->readFile(fileName))
     {
         statusBar()->showMessage(tr("Loading canceled"), 2000);
@@ -774,7 +818,7 @@ void MainWindow::updateApp()
 }
 
 
-void MainWindow::onResultUpdate(QNetworkReply* reply)
+void MainWindow::onResultUpdate(QNetworkReply* /* reply */)
 {
 //    if (currentReply->error() != QNetworkReply::NoError)
 //    {
