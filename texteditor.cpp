@@ -5,6 +5,7 @@
 #include <QKeyEvent>
 #include <QTextCodec>
 #include <QTime>
+#include <QMimeData>
 
 #include "my_plug-in/myheaders.h"
 #include "texteditor.h"
@@ -151,7 +152,6 @@ void TextEditor::keyPressEvent(QKeyEvent *ev)
     }
     QTextEdit::keyPressEvent(ev);
 }
-
 
 void TextEditor::findNext(const QString &str, Qt::CaseSensitivity cs)
 {

@@ -15,19 +15,13 @@
 #include <QStringList>
 #include <QDesktopWidget>
 #include <QKeyEvent>
-// 增加打印功能支持
-#if defined(QT_PRINTSUPPORT_LIB)
-#include <QtPrintSupport/qtprintsupportglobal.h>
-#if QT_CONFIG(printer)
-#if QT_CONFIG(printdialog)
-#include <QPrintDialog>
-#endif
 #include <QPrinter>
-#if QT_CONFIG(printpreviewdialog)
+// 增加打印功能支持
+
+#include <QtPrintSupport/qtprintsupportglobal.h>
+
+#include <QPrintDialog>
 #include <QPrintPreviewDialog>
-#endif
-#endif
-#endif
 
 #ifdef _MSC_VER
 #if _MSC_VER >= 1600
@@ -178,7 +172,7 @@ bool MainWindow::saveAs()
 
 void MainWindow::printFile()
 {
-#if QT_CONFIG(printdialog)
+
     QPrinter printer(QPrinter::HighResolution);
     QPrintDialog *dlg = new QPrintDialog(&printer, this);
     if (textEdit->textCursor().hasSelection())
@@ -191,17 +185,17 @@ void MainWindow::printFile()
 //    // 部分系统可以简写为
 //    QPrinter printer(QPrinter::HighResolution);
 //    textEdit->print(&printer);
-#endif
+
 }
 
 void MainWindow::printFilePreview()
 {
-#if QT_CONFIG(printpreviewdialog)
+
     QPrinter printer(QPrinter::HighResolution);
     QPrintPreviewDialog preview(&printer, this);
     connect(&preview, &QPrintPreviewDialog::paintRequested, this, &MainWindow::printPreview);
     preview.exec();
-#endif
+
 }
 
 void MainWindow::printPreview(QPrinter *printer)
@@ -266,6 +260,7 @@ void MainWindow::about()
 
 void MainWindow::textEditorModified()
 {
+    saveAction->setEnabled(true);
     setWindowModified(true);
 }
 
@@ -316,17 +311,10 @@ void MainWindow::createActions()
     saveAction->setStatusTip("保存文件");
     connect(saveAction, &QAction::triggered,
             this, &MainWindow::save);
-    // 比较好的按钮同步方法   BUG：为什么保存文件之后，saveAction仍然高亮？按代码逻辑的话，应该disable
-    connect(textEdit, &TextEditor::modificationChanged,
-            saveAction, &QAction::setEnabled);
-    saveAction->setEnabled(textEdit->document()->isModified());
-    // 注意对比上面的方法  此处的方法存在一个明显的BUG：就是文档保存之后，保存按钮依然高亮，不符合用户习惯
-//    connect(textEdit, &TextEditor::textChanged,
-//            [this]()
-//    {
-//        this->saveAction->setEnabled(true);
-//    });
-//    saveAction->setEnabled(false);
+    //对于textEdit来说，文本内容都是修改了的，会返回true
+//    connect(textEdit, &TextEditor::modificationChanged,
+//            saveAction, &QAction::setEnabled);
+    saveAction->setEnabled(false);
 
     saveAsAction = new QAction(tr("另存为(&A)..."), this);
     saveAsAction->setShortcut(tr("Ctrl+Alt+S"));
@@ -380,8 +368,14 @@ void MainWindow::createActions()
     undoAction->setStatusTip(tr("撤销"));
     connect(undoAction, &QAction::triggered,
             textEdit, &TextEditor::undo);
-    connect(textEdit, &TextEditor::undoAvailable,
-            undoAction, &QAction::setEnabled);
+    connect(textEdit, &TextEditor::undoAvailable,this, [=](bool available){
+        undoAction->setEnabled(available);
+        if(false == available) {
+            saveAction->setEnabled(false);
+            setCurrentFile(curFile);
+        }
+    });
+
     undoAction->setEnabled(textEdit->document()->isUndoAvailable());
     // 设定初始状态，注意与【复制】，【剪切】等动作的区别
     // undoAction->setEnabled(false);
@@ -718,6 +712,7 @@ bool MainWindow::loadFile(const QString &fileName)
 
     setCurrentFile(fileName);
     statusBar()->showMessage(tr("File loaded"), 2000);
+    saveAction->setEnabled(false);
     return true;
 }
 
@@ -731,6 +726,7 @@ bool MainWindow::saveFile(const QString &fileName)
 
     setCurrentFile(fileName);
     statusBar()->showMessage(tr("File saved"), 2000);
+    saveAction->setEnabled(false);
     return true;
 }
 
@@ -778,9 +774,7 @@ void MainWindow::MD5FileWidgetShow()
 {
     md5FileWidget = new MD5FileWidget;
     md5FileWidget->setAttribute(Qt::WA_DeleteOnClose);
-    md5FileWidget->show();
-    md5FileWidget->raise();
-    md5FileWidget->activateWindow();
+    md5FileWidget->exec();
 }
 
 void MainWindow::find()
