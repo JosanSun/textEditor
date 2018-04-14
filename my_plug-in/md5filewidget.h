@@ -1,13 +1,13 @@
 #ifndef MD5FILEWIDGET_H
 #define MD5FILEWIDGET_H
 
-#include <QWidget>
+#include <QDialog>
 
 namespace Ui {
 class MD5FileWidget;
 }
 
-class MD5FileWidget : public QWidget
+class MD5FileWidget : public QDialog
 {
     Q_OBJECT
 

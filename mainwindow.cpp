@@ -772,9 +772,7 @@ void MainWindow::MD5FileWidgetShow()
 {
     md5FileWidget = new MD5FileWidget;
     md5FileWidget->setAttribute(Qt::WA_DeleteOnClose);
-    md5FileWidget->show();
-    md5FileWidget->raise();
-    md5FileWidget->activateWindow();
+    md5FileWidget->exec();
 }
 
 void MainWindow::find()

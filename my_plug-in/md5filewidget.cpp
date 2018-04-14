@@ -9,7 +9,7 @@
 #include "my_plug-in/myheaders.h"
 
 MD5FileWidget::MD5FileWidget(QWidget *parent) :
-    QWidget(parent),
+    QDialog(parent),
     ui(new Ui::MD5FileWidget)
 {
     ui->setupUi(this);
