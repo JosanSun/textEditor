@@ -763,9 +763,11 @@ void MainWindow::updateRecentFileActions()
 
 void MainWindow::MD5WidgetShow()
 {
-    md5Widget = new MD5Widget(this);
+    md5Widget = new MD5Widget;
     md5Widget->setAttribute(Qt::WA_DeleteOnClose);
-    md5Widget->exec();
+    md5Widget->show();
+    md5Widget->raise();
+    md5Widget->activateWindow();
 }
 
 void MainWindow::MD5FileWidgetShow()
