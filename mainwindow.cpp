@@ -15,19 +15,13 @@
 #include <QStringList>
 #include <QDesktopWidget>
 #include <QKeyEvent>
-// 增加打印功能支持
-#if defined(QT_PRINTSUPPORT_LIB)
-#include <QtPrintSupport/qtprintsupportglobal.h>
-#if QT_CONFIG(printer)
-#if QT_CONFIG(printdialog)
-#include <QPrintDialog>
-#endif
 #include <QPrinter>
-#if QT_CONFIG(printpreviewdialog)
+// 增加打印功能支持
+
+#include <QtPrintSupport/qtprintsupportglobal.h>
+
+#include <QPrintDialog>
 #include <QPrintPreviewDialog>
-#endif
-#endif
-#endif
 
 #ifdef _MSC_VER
 #if _MSC_VER >= 1600
@@ -178,7 +172,7 @@ bool MainWindow::saveAs()
 
 void MainWindow::printFile()
 {
-#if QT_CONFIG(printdialog)
+
     QPrinter printer(QPrinter::HighResolution);
     QPrintDialog *dlg = new QPrintDialog(&printer, this);
     if (textEdit->textCursor().hasSelection())
@@ -191,17 +185,17 @@ void MainWindow::printFile()
 //    // 部分系统可以简写为
 //    QPrinter printer(QPrinter::HighResolution);
 //    textEdit->print(&printer);
-#endif
+
 }
 
 void MainWindow::printFilePreview()
 {
-#if QT_CONFIG(printpreviewdialog)
+
     QPrinter printer(QPrinter::HighResolution);
     QPrintPreviewDialog preview(&printer, this);
     connect(&preview, &QPrintPreviewDialog::paintRequested, this, &MainWindow::printPreview);
     preview.exec();
-#endif
+
 }
 
 void MainWindow::printPreview(QPrinter *printer)
@@ -380,8 +374,10 @@ void MainWindow::createActions()
     undoAction->setStatusTip(tr("撤销"));
     connect(undoAction, &QAction::triggered,
             textEdit, &TextEditor::undo);
-    connect(textEdit, &TextEditor::undoAvailable,
-            undoAction, &QAction::setEnabled);
+    connect(textEdit, &TextEditor::undoAvailable,this, [=](bool available){
+        undoAction->setEnabled(available);
+        setCurrentFile(curFile);
+    });
     undoAction->setEnabled(textEdit->document()->isUndoAvailable());
     // 设定初始状态，注意与【复制】，【剪切】等动作的区别
     // undoAction->setEnabled(false);
