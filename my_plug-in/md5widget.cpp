@@ -2,7 +2,7 @@
 
 #include "md5widget.h"
 
-MD5Widget::MD5Widget(QWidget *parent) : QWidget(parent)
+MD5Widget::MD5Widget(QWidget *parent) : QDialog(parent)
 {
     if (objectName().isEmpty())
     {
