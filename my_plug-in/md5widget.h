@@ -1,7 +1,7 @@
 #ifndef MD5WIDGET_H
 #define MD5WIDGET_H
 
-#include <QWidget>
+#include <QDialog>
 #include <QApplication>
 #include <QCheckBox>
 #include <QGridLayout>
@@ -10,7 +10,7 @@
 #include <QPushButton>
 #include <QTextBrowser>
 
-class MD5Widget : public QWidget
+class MD5Widget : public QDialog
 {
     Q_OBJECT
 public:
