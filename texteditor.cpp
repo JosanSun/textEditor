@@ -153,35 +153,6 @@ void TextEditor::keyPressEvent(QKeyEvent *ev)
     QTextEdit::keyPressEvent(ev);
 }
 
-void TextEditor::dragEnterEvent(QDragEnterEvent *e)
-{
-    if(e->mimeData()->hasFormat("text/uri-list")) {
-        e->acceptProposedAction();
-    }
-}
-
-void TextEditor::dropEvent(QDropEvent *e)
-{
-    QList<QUrl> urls = e->mimeData()->urls();
-        if(urls.isEmpty())
-            return;
-
-        QString fileName = urls.first().toLocalFile();
-
-        foreach (QUrl u, urls) {
-            qDebug()<<u.toString();
-        }
-        qDebug()<< urls.size();
-
-        if(fileName.isEmpty())
-            return;
-
-        if(readFile(fileName)){
-            setWindowTitle(tr("%1 - %2").arg(fileName).arg("Drag File"));
-        }
-}
-
-
 void TextEditor::findNext(const QString &str, Qt::CaseSensitivity cs)
 {
     QTextDocument::FindFlags flag;

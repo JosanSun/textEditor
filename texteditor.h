@@ -17,8 +17,6 @@ public:
 
 protected:
     void keyPressEvent(QKeyEvent* ev);
-    void dragEnterEvent(QDragEnterEvent *e);
-    void dropEvent(QDropEvent *e);
 
 public slots:
     void findNext(const QString& str, Qt::CaseSensitivity cs);
