@@ -260,6 +260,7 @@ void MainWindow::about()
 
 void MainWindow::textEditorModified()
 {
+    saveAction->setEnabled(true);
     setWindowModified(true);
 }
 
@@ -310,17 +311,10 @@ void MainWindow::createActions()
     saveAction->setStatusTip("保存文件");
     connect(saveAction, &QAction::triggered,
             this, &MainWindow::save);
-    // 比较好的按钮同步方法   BUG：为什么保存文件之后，saveAction仍然高亮？按代码逻辑的话，应该disable
-    connect(textEdit, &TextEditor::modificationChanged,
-            saveAction, &QAction::setEnabled);
-    saveAction->setEnabled(textEdit->document()->isModified());
-    // 注意对比上面的方法  此处的方法存在一个明显的BUG：就是文档保存之后，保存按钮依然高亮，不符合用户习惯
-//    connect(textEdit, &TextEditor::textChanged,
-//            [this]()
-//    {
-//        this->saveAction->setEnabled(true);
-//    });
-//    saveAction->setEnabled(false);
+    //对于textEdit来说，文本内容都是修改了的，会返回true
+//    connect(textEdit, &TextEditor::modificationChanged,
+//            saveAction, &QAction::setEnabled);
+    saveAction->setEnabled(false);
 
     saveAsAction = new QAction(tr("另存为(&A)..."), this);
     saveAsAction->setShortcut(tr("Ctrl+Alt+S"));
@@ -376,8 +370,12 @@ void MainWindow::createActions()
             textEdit, &TextEditor::undo);
     connect(textEdit, &TextEditor::undoAvailable,this, [=](bool available){
         undoAction->setEnabled(available);
-        setCurrentFile(curFile);
+        if(false == available) {
+            saveAction->setEnabled(false);
+            setCurrentFile(curFile);
+        }
     });
+
     undoAction->setEnabled(textEdit->document()->isUndoAvailable());
     // 设定初始状态，注意与【复制】，【剪切】等动作的区别
     // undoAction->setEnabled(false);
@@ -714,6 +712,7 @@ bool MainWindow::loadFile(const QString &fileName)
 
     setCurrentFile(fileName);
     statusBar()->showMessage(tr("File loaded"), 2000);
+    saveAction->setEnabled(false);
     return true;
 }
 
@@ -727,6 +726,7 @@ bool MainWindow::saveFile(const QString &fileName)
 
     setCurrentFile(fileName);
     statusBar()->showMessage(tr("File saved"), 2000);
+    saveAction->setEnabled(false);
     return true;
 }
 
