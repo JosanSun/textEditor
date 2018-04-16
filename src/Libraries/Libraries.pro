@@ -1,4 +1,4 @@
 TEMPLATE = subdirs
 
-SUBDIRS += \
-    qscintilla
+SUBDIRS += qscintilla
+CONFIG += ordered

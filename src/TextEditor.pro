@@ -1,5 +1,5 @@
 TEMPLATE = subdirs
 
-SUBDIRS += \
-    MainApps \
-    Libraries
+SUBDIRS +=  Libraries
+SUBDIRS +=  MainApps
+CONFIG += ordered
