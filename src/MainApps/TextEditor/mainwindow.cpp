@@ -37,6 +37,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     m_pTabWidget = new QTabWidget(this);
     m_pTextEdit = new TextEditor(this);
+    m_pTextEdit->setUtf8(true);
 
     this->setCentralWidget(m_pTabWidget);
 
