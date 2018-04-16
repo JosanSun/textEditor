@@ -16,6 +16,7 @@
 #include <QDesktopWidget>
 #include <QKeyEvent>
 #include <QPrinter>
+#include <QTabWidget>
 // 增加打印功能支持
 
 #include <QtPrintSupport/qtprintsupportglobal.h>
@@ -34,15 +35,22 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    textEdit = new TextEditor(this);
-    this->setCentralWidget(textEdit);
-    textEdit->setFocus();
-    textEdit->setAcceptDrops(false);
+    m_pTabWidget = new QTabWidget(this);
+    m_pTextEdit = new TextEditor(this);
+
+    this->setCentralWidget(m_pTabWidget);
+
+    m_pTabWidget->setTabsClosable(true);
+    m_pTabWidget->addTab(m_pTextEdit, tr("First"));
+
+
+    m_pTextEdit->setFocus();
+    m_pTextEdit->setAcceptDrops(false);
     setAcceptDrops(true);
 
-    textEdit->setMarginType(0, QsciScintilla::NumberMargin);//设置编号为0的页边显示行号。
-    textEdit->setMarginLineNumbers(0, true);//对该页边启用行号
-    textEdit->setMarginWidth(0, 35);//设置页边宽度
+    m_pTextEdit->setMarginType(0, QsciScintilla::NumberMargin);//设置编号为0的页边显示行号。
+    m_pTextEdit->setMarginLineNumbers(0, true);//对该页边启用行号
+    m_pTextEdit->setMarginWidth(0, 35);//设置页边宽度
 
     // 创建主界面
     createActions();
@@ -62,10 +70,10 @@ MainWindow::MainWindow(QWidget *parent)
     // 更新actions()
     updateActions();
 
-    connect(textEdit, SIGNAL(textChanged()) , this, SLOT(textEditorModified()));
-    connect(textEdit, SIGNAL(cursorPositionChanged(int, int)), this, SLOT(showCursorPosition(int, int)));
-    connect(textEdit, &TextEditor::overwriteModeChanged, [=](){
-           if(textEdit->overwriteMode())
+    connect(m_pTextEdit, SIGNAL(textChanged()) , this, SLOT(textEditorModified()));
+    connect(m_pTextEdit, SIGNAL(cursorPositionChanged(int, int)), this, SLOT(showCursorPosition(int, int)));
+    connect(m_pTextEdit, &TextEditor::overwriteModeChanged, [=](){
+           if(m_pTextEdit->overwriteMode())
            {
                insertModeLabel->setText("OVR");
            }
@@ -129,7 +137,7 @@ void MainWindow::newFile()
 {
     if(okToContinue())
     {
-        textEdit->clear();
+        m_pTextEdit->clear();
         setCurrentFile("");
     }
 }
@@ -275,7 +283,7 @@ void MainWindow::about()
 void MainWindow::textEditorModified()
 {
     saveAction->setEnabled(true);
-    setWindowModified(textEdit->isModified());
+    setWindowModified(m_pTextEdit->isModified());
 }
 
 void MainWindow::clipboardDataChanged()
@@ -382,7 +390,7 @@ void MainWindow::createActions()
     undoAction->setToolTip(tr("撤销"));
     undoAction->setStatusTip(tr("撤销"));
     connect(undoAction, &QAction::triggered,
-            textEdit, &TextEditor::undo);
+            m_pTextEdit, &TextEditor::undo);
 
     // connect(textEdit, &TextEditor::undoAvailable,
     //         this, [=](bool available)
@@ -405,7 +413,7 @@ void MainWindow::createActions()
     redoAction->setToolTip(tr("恢复"));
     redoAction->setStatusTip(tr("恢复"));
     connect(redoAction, &QAction::triggered,
-            textEdit, &TextEditor::redo);
+            m_pTextEdit, &TextEditor::redo);
 //    connect(textEdit, &TextEditor::redoAvailable,
 //            redoAction, &QAction::setEnabled);
 //    redoAction->setEnabled(textEdit->document()->isRedoAvailable());
@@ -418,7 +426,7 @@ void MainWindow::createActions()
     cutAction->setStatusTip(tr("剪切文本"));
     cutAction->setEnabled(false);
     connect(cutAction, &QAction::triggered,
-            textEdit, &TextEditor::cut);
+            m_pTextEdit, &TextEditor::cut);
 
     copyAction = new QAction(tr("复制(&C)"), this);
     copyAction->setIcon(QIcon(":/images/copy.png"));
@@ -427,8 +435,8 @@ void MainWindow::createActions()
     copyAction->setStatusTip(tr("复制文本"));
     copyAction->setEnabled(false);
     connect(copyAction, &QAction::triggered,
-            textEdit, &TextEditor::copy);
-    connect(textEdit, SIGNAL(copyAvailable(bool)), this, SLOT(slotCopyAvailable(bool)));
+            m_pTextEdit, &TextEditor::copy);
+    connect(m_pTextEdit, SIGNAL(copyAvailable(bool)), this, SLOT(slotCopyAvailable(bool)));
 
     pasteAction = new QAction(tr("粘贴(&P)"), this);
     pasteAction->setIcon(QIcon(":/images/paste.png"));
@@ -436,7 +444,7 @@ void MainWindow::createActions()
     pasteAction->setToolTip(tr("粘贴文本"));
     pasteAction->setStatusTip(tr("粘贴文本"));
     connect(pasteAction, &QAction::triggered,
-            textEdit, &TextEditor::paste);
+            m_pTextEdit, &TextEditor::paste);
     // 绑定
     connect(QApplication::clipboard(), &QClipboard::dataChanged,
             this, &MainWindow::clipboardDataChanged);
@@ -455,7 +463,7 @@ void MainWindow::createActions()
             {
                 QKeyEvent* event = new QKeyEvent(QEvent::KeyPress,
                                                  Qt::Key_Delete, Qt::NoModifier);
-                QCoreApplication::postEvent(textEdit, event);
+                QCoreApplication::postEvent(m_pTextEdit, event);
             });
 
     selectAllAction = new QAction(tr("全选(&L)"), this);
@@ -463,7 +471,7 @@ void MainWindow::createActions()
     selectAllAction->setToolTip(tr("全选文本"));
     selectAllAction->setStatusTip(tr("全选文本"));
     connect(selectAllAction, &QAction::triggered,
-            textEdit, &TextEditor::selectAll);
+            m_pTextEdit, &TextEditor::selectAll);
 
     findAction = new QAction(tr("查找(&F)..."), this);
     findAction->setIcon(QIcon(":/images/find.png"));
@@ -574,12 +582,12 @@ void MainWindow::createMenus()
 
 void MainWindow::createContextMenu()
 {
-    textEdit->addAction(copyAction);
-    textEdit->addAction(cutAction);
-    textEdit->addAction(pasteAction);
-    textEdit->addAction(deleteAction);
-    textEdit->addAction(selectAllAction);
-    textEdit->setContextMenuPolicy(Qt::ActionsContextMenu);
+    m_pTextEdit->addAction(copyAction);
+    m_pTextEdit->addAction(cutAction);
+    m_pTextEdit->addAction(pasteAction);
+    m_pTextEdit->addAction(deleteAction);
+    m_pTextEdit->addAction(selectAllAction);
+    m_pTextEdit->setContextMenuPolicy(Qt::ActionsContextMenu);
 }
 
 void MainWindow::createToolBars()
@@ -619,7 +627,7 @@ void MainWindow::createStatusBar()
     rowColumnLabel->setAlignment(Qt::AlignLeft);
     rowColumnLabel->setMinimumSize(rowColumnLabel->sizeHint());
 
-    EndOfLineText endLineFormat = textEdit->getLineFormat();
+    EndOfLineText endLineFormat = m_pTextEdit->getLineFormat();
     if(endLineFormat == EndOfLineText::Windows1)
     {
         lineFormat = EndOfLine::Windows;
@@ -672,7 +680,7 @@ void MainWindow::setCurrentFile(const QString &fileName)
     {
         curFile.append("new");
     }
-    textEdit->setModified(false);
+    m_pTextEdit->setModified(false);
 
     setWindowModified(false);
 
@@ -791,7 +799,7 @@ bool MainWindow::loadFile(const QString &fileName)
 
     QTextStream in(&file);
     QApplication::setOverrideCursor(Qt::WaitCursor);
-    textEdit->setText(in.readAll());
+    m_pTextEdit->setText(in.readAll());
     QApplication::restoreOverrideCursor();
 
     setCurrentFile(fileName);
@@ -819,7 +827,7 @@ bool MainWindow::saveFile(const QString &fileName)
 
     QTextStream out(&file);
     QApplication::setOverrideCursor(Qt::WaitCursor);
-    out << textEdit->text();
+    out << m_pTextEdit->text();
     QApplication::restoreOverrideCursor();
 
     setCurrentFile(fileName);
@@ -882,9 +890,9 @@ void MainWindow::find()
     {
         findDialog = new FindDialog(this);
         connect(findDialog, &FindDialog::findNext,
-                textEdit, &TextEditor::findNext);
+                m_pTextEdit, &TextEditor::findNext);
         connect(findDialog, &FindDialog::findPrevious,
-                textEdit, &TextEditor::findPrevious);
+                m_pTextEdit, &TextEditor::findPrevious);
     }
 
     findDialog->show();
@@ -973,7 +981,7 @@ void MainWindow::downloadNewApp()
 
 void MainWindow::updateEndOfLineModeLabel()
 {
-    EndOfLineText endLineFormat = textEdit->getLineFormat();
+    EndOfLineText endLineFormat = m_pTextEdit->getLineFormat();
     if(endLineFormat == EndOfLineText::Windows1)
     {
         lineFormat = EndOfLine::Windows;
