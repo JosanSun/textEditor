@@ -25,6 +25,7 @@
 #include <qsettings.h>
 
 #include "Qsci/qscilexerjavascript.h"
+
 #include "Qsci/qscilexerpython.h"
 
 

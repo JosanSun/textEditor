@@ -774,7 +774,7 @@ bool MainWindow::loadFile(const QString &fileName)
 {
     QFileInfo fileInfo(fileName);
     // 如果文件的大小超过200MB，则显示无法打开。
-    if(fileInfo.size() > 15 * 1024 * 1024)
+    if(fileInfo.size() > 200 * 1024 * 1024)
     {
         QMessageBox::warning(this, tr("文件大小问题"),
                              tr("<p>文件太大, Text Editor打不开。"
