@@ -47,18 +47,21 @@ MainWindow::MainWindow(QWidget *parent)
     createToolBars();
     createStatusBar();
 
-    // 读取配置
-    readSettings();
-
     setWindowIcon(QIcon(":/images/fileIcon.png"));
     this->setCurrentFile("");
     //this->resize(500, 300);
     setUnifiedTitleAndToolBarOnMac(true);
 
+    // 读取配置
+    readSettings();
 
+    // 更新actions()
+    updateActions();
 
     connect(textEdit, &TextEditor::textChanged,
             this, &MainWindow::textEditorModified);
+    connect(textEdit, &TextEditor::textChanged,
+            this, &MainWindow::showSizeLines);
     connect(textEdit, &TextEditor::cursorPositionChanged,
             this, &MainWindow::showCursorPosition);
     connect(textEdit, &TextEditor::overwriteModeChanged,
@@ -144,6 +147,7 @@ void MainWindow::open()
             loadFile(fileName);
         }
     }
+    updateEndOfLineModeLabel();
 }
 
 bool MainWindow::save()
@@ -230,18 +234,28 @@ void MainWindow::setFullScreen()
 {
     if(isFullScreen())
     {
-        //menuBar()->show();
+        // menuBar()->setVisible(true);
         mainToolBar->show();
         statusBar()->show();
         this->setWindowState(Qt::WindowMaximized);
     }
     else
     {
-        //menuBar()->hide();   // ??? menuBar()->hide可以隐藏，但是想显示却无法显示出来。不知为什么，跟statusBar()还有区别.
+        // menuBar()->setVisible(false);   // ??? menuBar()->hide可以隐藏，但是想显示却无法显示出来。不知为什么，跟statusBar()还有区别.
         mainToolBar->hide();
         statusBar()->hide();
         this->setWindowState(Qt::WindowFullScreen);
     }
+}
+
+void MainWindow::changeAutoLine()
+{
+    isAutoLine = autoLineAction->isChecked();
+    textEdit->setLineWrapMode(isAutoLine ? QTextEdit::WidgetWidth : QTextEdit::NoWrap);
+
+    QSettings settings(QCoreApplication::organizationName(),
+                       QCoreApplication::applicationName());
+    settings.setValue("autoLineSwitch", QVariant(isAutoLine ? "1" : "0"));
 }
 
 void MainWindow::about()
@@ -284,6 +298,7 @@ void MainWindow::openRecentFile()
             loadFile(action->data().toString());
         }
     }
+    updateEndOfLineModeLabel();
 }
 
 void MainWindow::createActions()
@@ -368,9 +383,12 @@ void MainWindow::createActions()
     undoAction->setStatusTip(tr("撤销"));
     connect(undoAction, &QAction::triggered,
             textEdit, &TextEditor::undo);
-    connect(textEdit, &TextEditor::undoAvailable,this, [=](bool available){
+    connect(textEdit, &TextEditor::undoAvailable,
+            this, [=](bool available)
+    {
         undoAction->setEnabled(available);
-        if(false == available) {
+        if(false == available)
+        {
             saveAction->setEnabled(false);
             setCurrentFile(curFile);
         }
@@ -463,6 +481,13 @@ void MainWindow::createActions()
     connect(fullScreenAction, &QAction::triggered,
             this, &MainWindow::setFullScreen);
 
+    autoLineAction = new QAction(tr("自动换行"), this);
+    // 打开可选开关
+    autoLineAction->setCheckable(true);
+    autoLineAction->setChecked(isAutoLine);
+    connect(autoLineAction, &QAction::triggered, this, &MainWindow::changeAutoLine);
+
+
     optionAction = new QAction(tr("首选项..."), this);
     optionAction->setToolTip(tr("配置程序"));
     optionAction->setStatusTip(tr("配置程序"));
@@ -528,6 +553,8 @@ void MainWindow::createMenus()
     // 视图菜单
     viewMenu = menuBar()->addMenu(tr("视图(&V)"));
     viewMenu->addAction(fullScreenAction);
+    viewMenu->addSeparator();
+    viewMenu->addAction(autoLineAction);
 
     // 设置菜单
     settingsMenu = menuBar()->addMenu(tr("设置(&T)"));
@@ -582,9 +609,39 @@ void MainWindow::createStatusBar()
     // showLabel->setMargin(2); // 设定边距
     showLabel->setIndent(50);   // 设定间距
 
+    sizeLinesLabel = new QLabel(tr("length : %1  lines : %2")
+                                  .arg(textEdit->document()->characterCount() - 1)
+                                  .arg(textEdit->document()->lineCount()));
+    sizeLinesLabel->setAlignment(Qt::AlignLeft);
+    sizeLinesLabel->setMinimumSize(sizeLinesLabel->sizeHint());
+
     rowColumnLabel = new QLabel(tr("Ln : 1   Col : 1"));
     rowColumnLabel->setAlignment(Qt::AlignLeft);
     rowColumnLabel->setMinimumSize(rowColumnLabel->sizeHint());
+
+    EndOfLineText endLineFormat = textEdit->getLineFormat();
+    if(endLineFormat == EndOfLineText::Windows1)
+    {
+        lineFormat = EndOfLine::Windows;
+        endOfLineModeLabel = new QLabel(tr("Windows (CR LF)"));
+    }
+    else if(endLineFormat == EndOfLineText::Unix1)
+    {
+        lineFormat = EndOfLine::Unix;
+        endOfLineModeLabel = new QLabel(tr("Unix (LF)"));
+    }
+    else if(endLineFormat == EndOfLineText::Mac1)
+    {
+        lineFormat = EndOfLine::Mac;
+        endOfLineModeLabel = new QLabel(tr("Macintosh (CR)"));
+    }
+    else
+    {
+        lineFormat = EndOfLine::Default;
+        endOfLineModeLabel = new QLabel(tr("Unix (LF)"));
+    }
+    endOfLineModeLabel->setAlignment(Qt::AlignLeft);
+    endOfLineModeLabel->setMinimumSize(endOfLineModeLabel->sizeHint());
 
     insertModeLabel = new QLabel(tr("INS"));
 //    if(textEdit->overwriteMode())
@@ -600,20 +657,19 @@ void MainWindow::createStatusBar()
 
     statusBar()->addWidget(showLabel);
     // rowcol | insertMode
+
+    statusBar()->addPermanentWidget(sizeLinesLabel);
     statusBar()->addPermanentWidget(rowColumnLabel);
+    statusBar()->addPermanentWidget(endOfLineModeLabel);
     statusBar()->addPermanentWidget(insertModeLabel);
 }
 
 void MainWindow::setCurrentFile(const QString &fileName)
 {
     curFile = fileName;
-    if(fileName.isEmpty())
-    {
-        curFile.append("new");
-    }
     setWindowModified(false);
 
-    QString shownName = tr("new");
+    shownName = tr("new");
 
     if(!curFile.isEmpty())
     {
@@ -649,6 +705,9 @@ void MainWindow::readSettings()
     }
 
     recentFiles = settings.value("recentFiles").toStringList();
+
+    isAutoLine = settings.value("autoLineSwitch").toInt() == 1 ? true : false;
+
     updateRecentFileActions();
 }
 
@@ -660,13 +719,17 @@ void MainWindow::writeSettings()
     settings.setValue("geometry", saveGeometry());
 
     settings.setValue("recentFiles", recentFiles);
+
+    settings.setValue("autoLineSwitch", autoLineAction->isChecked() ? 1 : 0);
 }
 
 bool MainWindow::okToContinue()
 {
     if(isWindowModified())
     {
-        QMessageBox box(QMessageBox::Question, tr("保存"), tr("是否保存文件\"%1\"?").arg(curFile));
+        QMessageBox box(QMessageBox::Question, tr("保存"),
+                        tr("是否保存文件\"%1\"?").arg(curFile.isEmpty() ? shownName : curFile));
+
         // 去掉问号！  区分Icon与WindowIcon
         //box.setIcon(QMessageBox::NoIcon);
         box.setWindowIcon(QIcon(":/images/fileIcon.png"));
@@ -680,7 +743,7 @@ bool MainWindow::okToContinue()
 //                                       QMessageBox::Yes | QMessageBox::No
 //                                       | QMessageBox::Cancel);
         int res = box.exec();
-        if(res == QMessageBox::Yes)
+        if(res == QMessageBox::Ok)
         {
             return save();
         }
@@ -765,9 +828,10 @@ void MainWindow::MD5WidgetShow()
 {
     md5Widget = new MD5Widget;
     md5Widget->setAttribute(Qt::WA_DeleteOnClose);
-    md5Widget->show();
-    md5Widget->raise();
-    md5Widget->activateWindow();
+    md5Widget->exec();
+//    md5Widget->show();
+//    md5Widget->raise();
+//    md5Widget->activateWindow();
 }
 
 void MainWindow::MD5FileWidgetShow()
@@ -845,6 +909,14 @@ void MainWindow::onResultUpdate(QNetworkReply* /* reply */)
 //    }
 }
 
+// 显示当前文档的字符总数以及总行数  NOTE: 注意这里的中文字符按一个字符来算
+void MainWindow::showSizeLines()
+{
+    sizeLinesLabel->setText(tr("length : %1  lines : %2")
+                            .arg(textEdit->document()->characterCount() - 1)
+                            .arg(textEdit->document()->lineCount()));
+}
+
 // 显示当前光标所在的行列号
 void MainWindow::showCursorPosition()
 {
@@ -859,6 +931,36 @@ void MainWindow::downloadNewApp()
 
 }
 
+void MainWindow::updateEndOfLineModeLabel()
+{
+    EndOfLineText endLineFormat = textEdit->getLineFormat();
+    if(endLineFormat == EndOfLineText::Windows1)
+    {
+        lineFormat = EndOfLine::Windows;
+        endOfLineModeLabel->setText(tr("Windows (CR LF)"));
+    }
+    else if(endLineFormat == EndOfLineText::Unix1)
+    {
+        lineFormat = EndOfLine::Unix;
+        endOfLineModeLabel->setText(tr("Unix (LF)"));
+    }
+    else if(endLineFormat == EndOfLineText::Mac1)
+    {
+        lineFormat = EndOfLine::Mac;
+        endOfLineModeLabel->setText(tr("Macintosh (CR)"));
+    }
+    else
+    {
+        lineFormat = EndOfLine::Default;
+        endOfLineModeLabel->setText(tr("Unix (LF)"));
+    }
+}
+
+void MainWindow::updateActions()
+{
+    autoLineAction->setChecked(isAutoLine);
+    textEdit->setLineWrapMode(isAutoLine ? QTextEdit::WidgetWidth : QTextEdit::NoWrap);
+}
 
 
 

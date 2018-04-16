@@ -98,6 +98,10 @@ TextEditor程序项目结构图
 
 2. [rich text Example](http://doc.qt.io/qt-5/examples-richtext.html  "官方例子")
 
+3. [notepad](https://github.com/thunderobot/notepad)
+
+
 ## 致谢
 
 感谢@[scienceasdf](https://github.com/scienceasdf)提供的MD5校验功能。
+感谢@[Longxr](https://github.com/Longxr)对save菜单项和MD5工具的改进。

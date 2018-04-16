@@ -19,6 +19,11 @@ class FindDialog;
 class QPrinter;
 QT_END_NAMESPACE
 
+enum EndOfLine
+{
+    Default, Windows, Unix, Mac
+};
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -46,6 +51,10 @@ private:
     void setCurrentFile(const QString& fileName);
     bool saveFile(const QString& fileName);
     void updateRecentFileActions();
+    void updateEndOfLineModeLabel();
+    // 更新自动换行菜单项
+    void updateActions();
+
 
 private slots:
     void newFile();
@@ -64,13 +73,18 @@ private slots:
     void MD5FileWidgetShow();
     void find();
     void setFullScreen();
+    void changeAutoLine();
     void updateApp();
     void onResultUpdate(QNetworkReply*);
+    // 显示大小和总行数的状态栏
+    void showSizeLines();
+    // 更新当前光标所在的行列号
     void showCursorPosition();
 
 private:
     // 当前文件名
     QString curFile;            // 带有路径的文件名 eg：C:\test\test.txt
+    QString shownName;           // 作为curFile的辅助，主要在curFile为空时，辅助shownName为new
     QStringList recentFiles;    // recentFiles文件名存储格式与curFile一致
     // 主编辑界面
     TextEditor* textEdit         = nullptr;
@@ -79,10 +93,16 @@ private:
     MD5Widget* md5Widget         = nullptr;
     MD5FileWidget* md5FileWidget = nullptr;
 
-    // 状态栏的3个显示标签
-    QLabel* showLabel       = nullptr;
-    QLabel* rowColumnLabel  = nullptr;
-    QLabel* insertModeLabel = nullptr;
+    EndOfLine lineFormat = EndOfLine::Default;
+
+    // 状态栏的5个显示标签
+    QLabel* showLabel            = nullptr;
+    QLabel* sizeLinesLabel       = nullptr;
+    QLabel* rowColumnLabel       = nullptr;
+    QLabel* endOfLineModeLabel   = nullptr;
+    QLabel* insertModeLabel      = nullptr;
+
+    bool isAutoLine = true;
 
     // 菜单项
     QMenu* fileMenu     = nullptr;
@@ -119,6 +139,7 @@ private:
     QAction* selectAllAction   = nullptr;
     QAction* findAction        = nullptr;
     QAction* fullScreenAction  = nullptr;
+    QAction* autoLineAction    = nullptr;
     QAction* optionAction      = nullptr;
     QAction* generateMD5Action = nullptr;
     QAction* generateMD5FileAction = nullptr;

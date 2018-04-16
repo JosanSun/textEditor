@@ -2,7 +2,7 @@
 
 #include "md5widget.h"
 
-MD5Widget::MD5Widget(QWidget *parent) : QWidget(parent)
+MD5Widget::MD5Widget(QWidget *parent) : QDialog(parent)
 {
     if (objectName().isEmpty())
     {
@@ -63,8 +63,9 @@ MD5Widget::MD5Widget(QWidget *parent) : QWidget(parent)
     mainLayout->addWidget(widget_2);
     this->setLayout(mainLayout);
 
-    // 去除最大最小化按钮
-    setWindowFlags(windowFlags() & ~Qt::WindowMinMaxButtonsHint);
+//    // 去除最大最小化按钮
+//    setWindowFlags(windowFlags() & ~Qt::WindowMinMaxButtonsHint);
+    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
     this->setWindowTitle(tr("生成MD5值"));
     copyButton->setText(tr("复制到剪贴板"));
     closeButton->setText(tr("关闭"));

@@ -30,7 +30,8 @@ TextEditor::TextEditor(QWidget* parent):QTextEdit(parent)
 bool TextEditor::readFile(const QString &fileName)
 {
     QFile file(fileName);
-    if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    // QIODevice::Text 会改变原来文件的换行方式，不推荐这种打开方式
+    if(!file.open(QIODevice::ReadOnly))
     {
         QMessageBox::warning(this, tr("TextEditor"),
                              tr("Cannot read file %1.\n%2.")
@@ -84,6 +85,24 @@ bool TextEditor::readFile(const QString &fileName)
     // 打开20MB的文件失败
 
     const QByteArray data = file.readAll();
+    // 判断换行方式
+    if(data.contains(QByteArray("\r\n")))
+    {
+        lineFormat = EndOfLineText::Windows1;
+    }
+    else if(data.contains('\r'))
+    {
+        lineFormat = EndOfLineText::Mac1;
+    }
+    else if(data.contains('\n'))
+    {
+        lineFormat = EndOfLineText::Unix1;
+    }
+    else
+    {
+        lineFormat = EndOfLineText::Default1;
+    }
+
     t2 = QTime::currentTime();
     qcout << t1.msecsTo(t2);
     QTextCodec::ConverterState state;
@@ -186,4 +205,9 @@ void TextEditor::findPrevious(const QString &str, Qt::CaseSensitivity cs)
 void TextEditor::signalTextModification(bool changed)
 {
     emit modificationChanged(changed);
+}
+
+EndOfLineText TextEditor::getLineFormat()
+{
+    return lineFormat;
 }
