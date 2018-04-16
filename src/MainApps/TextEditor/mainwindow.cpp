@@ -40,6 +40,10 @@ MainWindow::MainWindow(QWidget *parent)
     textEdit->setAcceptDrops(false);
     setAcceptDrops(true);
 
+    textEdit->setMarginType(0, QsciScintilla::NumberMargin);//设置编号为0的页边显示行号。
+    textEdit->setMarginLineNumbers(0, true);//对该页边启用行号
+    textEdit->setMarginWidth(0, 35);//设置页边宽度
+
     // 创建主界面
     createActions();
     createMenus();
