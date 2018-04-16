@@ -173,14 +173,14 @@ bool MainWindow::saveAs()
 void MainWindow::printFile()
 {
 
-    QPrinter printer(QPrinter::HighResolution);
-    QPrintDialog *dlg = new QPrintDialog(&printer, this);
-    if (textEdit->textCursor().hasSelection())
-        dlg->addEnabledOption(QAbstractPrintDialog::PrintSelection);
-    dlg->setWindowTitle(tr("打印文档"));
-    if (dlg->exec() == QDialog::Accepted)
-        textEdit->print(&printer);
-    delete dlg;
+//    QPrinter printer(QPrinter::HighResolution);
+//    QPrintDialog *dlg = new QPrintDialog(&printer, this);
+//    if (textEdit->textCursor().hasSelection())
+//        dlg->addEnabledOption(QAbstractPrintDialog::PrintSelection);
+//    dlg->setWindowTitle(tr("打印文档"));
+//    if (dlg->exec() == QDialog::Accepted)
+//        textEdit->print(&printer);
+//    delete dlg;
 
 //    // 部分系统可以简写为
 //    QPrinter printer(QPrinter::HighResolution);
@@ -200,30 +200,30 @@ void MainWindow::printFilePreview()
 
 void MainWindow::printPreview(QPrinter *printer)
 {
-#ifdef QT_NO_PRINTER
-    Q_UNUSED(printer);
-#else
-    textEdit->print(printer);
-#endif
+//#ifdef QT_NO_PRINTER
+//    Q_UNUSED(printer);
+//#else
+//    textEdit->print(printer);
+//#endif
 }
 
 void MainWindow::printFilePDF()
 {
-#ifndef QT_NO_PRINTER
-    QFileDialog fileDialog(this, tr("导出PDF文件..."));
-    fileDialog.setAcceptMode(QFileDialog::AcceptSave);
-    fileDialog.setMimeTypeFilters(QStringList("application/pdf"));
-    fileDialog.setDefaultSuffix("pdf");
-    if (fileDialog.exec() != QDialog::Accepted)
-        return;
-    QString fileName = fileDialog.selectedFiles().first();
-    QPrinter printer(QPrinter::HighResolution);
-    printer.setOutputFormat(QPrinter::PdfFormat);
-    printer.setOutputFileName(fileName);
-    textEdit->document()->print(&printer);
-    statusBar()->showMessage(tr("Exported \"%1\"")
-                             .arg(QDir::toNativeSeparators(fileName)));
-#endif
+//#ifndef QT_NO_PRINTER
+//    QFileDialog fileDialog(this, tr("导出PDF文件..."));
+//    fileDialog.setAcceptMode(QFileDialog::AcceptSave);
+//    fileDialog.setMimeTypeFilters(QStringList("application/pdf"));
+//    fileDialog.setDefaultSuffix("pdf");
+//    if (fileDialog.exec() != QDialog::Accepted)
+//        return;
+//    QString fileName = fileDialog.selectedFiles().first();
+//    QPrinter printer(QPrinter::HighResolution);
+//    printer.setOutputFormat(QPrinter::PdfFormat);
+//    printer.setOutputFileName(fileName);
+//    textEdit->document()->print(&printer);
+//    statusBar()->showMessage(tr("Exported \"%1\"")
+//                             .arg(QDir::toNativeSeparators(fileName)));
+//#endif
 }
 
 void MainWindow::setFullScreen()
@@ -261,7 +261,7 @@ void MainWindow::about()
 void MainWindow::textEditorModified()
 {
     saveAction->setEnabled(true);
-    setWindowModified(true);
+    setWindowModified(textEdit->isModified());
 }
 
 void MainWindow::clipboardDataChanged()
@@ -368,15 +368,15 @@ void MainWindow::createActions()
     undoAction->setStatusTip(tr("撤销"));
     connect(undoAction, &QAction::triggered,
             textEdit, &TextEditor::undo);
-    connect(textEdit, &TextEditor::undoAvailable,this, [=](bool available){
-        undoAction->setEnabled(available);
-        if(false == available) {
-            saveAction->setEnabled(false);
-            setCurrentFile(curFile);
-        }
-    });
+//    connect(textEdit, &TextEditor::undoAvailable,this, [=](bool available){
+//        undoAction->setEnabled(available);
+//        if(false == available) {
+//            saveAction->setEnabled(false);
+//            setCurrentFile(curFile);
+//        }
+//    });
 
-    undoAction->setEnabled(textEdit->document()->isUndoAvailable());
+//    undoAction->setEnabled(textEdit->document()->isUndoAvailable());
     // 设定初始状态，注意与【复制】，【剪切】等动作的区别
     // undoAction->setEnabled(false);
 
@@ -387,9 +387,9 @@ void MainWindow::createActions()
     redoAction->setStatusTip(tr("恢复"));
     connect(redoAction, &QAction::triggered,
             textEdit, &TextEditor::redo);
-    connect(textEdit, &TextEditor::redoAvailable,
-            redoAction, &QAction::setEnabled);
-    redoAction->setEnabled(textEdit->document()->isRedoAvailable());
+//    connect(textEdit, &TextEditor::redoAvailable,
+//            redoAction, &QAction::setEnabled);
+//    redoAction->setEnabled(textEdit->document()->isRedoAvailable());
     // redoAction->setEnabled(false);
 
     cutAction = new QAction(tr("剪切(&T)"), this);
@@ -611,6 +611,7 @@ void MainWindow::setCurrentFile(const QString &fileName)
     {
         curFile.append("new");
     }
+    textEdit->setModified(false);
     setWindowModified(false);
 
     QString shownName = tr("new");
@@ -704,11 +705,25 @@ bool MainWindow::loadFile(const QString &fileName)
         return false;
     }
 
-    if(!textEdit->readFile(fileName))
-    {
-        statusBar()->showMessage(tr("Loading canceled"), 2000);
+//    if(!textEdit->readFile(fileName))
+//    {
+//        statusBar()->showMessage(tr("Loading canceled"), 2000);
+//        return false;
+//    }
+
+    QFile file(fileName);
+    if (!file.open(QFile::ReadOnly)) {
+        QMessageBox::warning(this, tr("Application"),
+                             tr("Cannot read file %1:\n%2.")
+                             .arg(fileName)
+                             .arg(file.errorString()));
         return false;
     }
+
+    QTextStream in(&file);
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    textEdit->setText(in.readAll());
+    QApplication::restoreOverrideCursor();
 
     setCurrentFile(fileName);
     statusBar()->showMessage(tr("File loaded"), 2000);
@@ -718,11 +733,25 @@ bool MainWindow::loadFile(const QString &fileName)
 
 bool MainWindow::saveFile(const QString &fileName)
 {
-    if(!textEdit->writeFile(fileName))
-    {
-        statusBar()->showMessage(tr("Saving canceled"), 2000);
+//    if(!textEdit->writeFile(fileName))
+//    {
+//        statusBar()->showMessage(tr("Saving canceled"), 2000);
+//        return false;
+//    }
+
+    QFile file(fileName);
+    if (!file.open(QFile::WriteOnly)) {
+        QMessageBox::warning(this, tr("Application"),
+                             tr("Cannot write file %1:\n%2.")
+                             .arg(fileName)
+                             .arg(file.errorString()));
         return false;
     }
+
+    QTextStream out(&file);
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    out << textEdit->text();
+    QApplication::restoreOverrideCursor();
 
     setCurrentFile(fileName);
     statusBar()->showMessage(tr("File saved"), 2000);
@@ -848,9 +877,9 @@ void MainWindow::onResultUpdate(QNetworkReply* /* reply */)
 // 显示当前光标所在的行列号
 void MainWindow::showCursorPosition()
 {
-    int row = textEdit->textCursor().blockNumber() + 1;
-    int col = textEdit->textCursor().columnNumber() + 1;
-    rowColumnLabel->setText(tr("Ln : %1   Col : %2").arg(row).arg(col));
+//    int row = textEdit->textCursor().blockNumber() + 1;
+//    int col = textEdit->textCursor().columnNumber() + 1;
+//    rowColumnLabel->setText(tr("Ln : %1   Col : %2").arg(row).arg(col));
 }
 
 

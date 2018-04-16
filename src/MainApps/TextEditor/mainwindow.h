@@ -73,7 +73,7 @@ private:
     QString curFile;            // 带有路径的文件名 eg：C:\test\test.txt
     QStringList recentFiles;    // recentFiles文件名存储格式与curFile一致
     // 主编辑界面
-    TextEditor* textEdit         = nullptr;
+    TextEditor* textEdit      = nullptr;
     // 查找对话框
     FindDialog* findDialog       = nullptr;
     MD5Widget* md5Widget         = nullptr;

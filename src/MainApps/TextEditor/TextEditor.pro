@@ -14,7 +14,12 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = TextEditor
 TEMPLATE = app
 
+win32-msvc*:QMAKE_CXXFLAGS += /wd"4100"
 include(./../../Path.pri)
+
+INCLUDEPATH += ../../Libraries/qscintilla
+
+LIBS += -L$${DESTDIR} -lqscintilla2_qt5d
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which as been marked as deprecated (the exact warnings

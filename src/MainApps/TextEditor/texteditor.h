@@ -2,8 +2,9 @@
 #define MAINWINDOW_H
 
 #include <QTextEdit>
+#include <Qsci/qsciscintilla.h>
 
-class TextEditor : public QTextEdit
+class TextEditor : public QsciScintilla
 {
     Q_OBJECT
 signals:

@@ -10,7 +10,7 @@
 #include "my_plug-in/myheaders.h"
 #include "texteditor.h"
 
-TextEditor::TextEditor(QWidget* parent):QTextEdit(parent)
+TextEditor::TextEditor(QWidget* parent): QsciScintilla(parent)
 {
     clear();
 
@@ -19,12 +19,12 @@ TextEditor::TextEditor(QWidget* parent):QTextEdit(parent)
     // QTextOption::WrapAtWordBoundaryOrAnywhere 是默认格式        // 40s
     // setWordWrapMode(QTextOption::NoWrap);                      // 177ms
     // setWordWrapMode(QTextOption::ManualWrap);                  // 159ms   QTextOption::ManualWrap  Same as QTextOption::NoWrap
-    setWordWrapMode(QTextOption::WrapAnywhere);                // 1189ms
+//    setWordWrapMode(QTextOption::WrapAnywhere);                // 1189ms
     // setWordWrapMode(QTextOption::WordWrap);                    // 180ms
 
 
-    connect(this->document(), &QTextDocument::modificationChanged,
-            this, &TextEditor::signalTextModification);
+//    connect(this->document(), &QTextDocument::modificationChanged,
+//            this, &TextEditor::signalTextModification);
 }
 
 bool TextEditor::readFile(const QString &fileName)
@@ -100,12 +100,12 @@ bool TextEditor::readFile(const QString &fileName)
         if (!codec1)
             return false;
         qcout << "invalidChars > 0";
-        setPlainText(codec1->toUnicode(data));
+//        setPlainText(codec1->toUnicode(data));
     }
     else
     {
         qcout << "invalidChars = 0";
-        setPlainText(text);
+//        setPlainText(text);
     }
     t4 = QTime::currentTime();
     qcout << t3.msecsTo(t4);
@@ -133,7 +133,7 @@ bool TextEditor::writeFile(const QString &fileName)
     QApplication::setOverrideCursor(Qt::WaitCursor);
 #endif
 
-    out << this -> toPlainText();
+//    out << this -> toPlainText();
 
 #ifndef QT_NO_CURSOR
     QApplication::restoreOverrideCursor();
@@ -150,37 +150,37 @@ void TextEditor::keyPressEvent(QKeyEvent *ev)
         emit overwriteModeChanged();
         return ;
     }
-    QTextEdit::keyPressEvent(ev);
+    QsciScintilla::keyPressEvent(ev);
 }
 
 void TextEditor::findNext(const QString &str, Qt::CaseSensitivity cs)
 {
-    QTextDocument::FindFlags flag;
-    flag = ((cs == Qt::CaseSensitive)? QTextDocument::FindCaseSensitively : flag);
+//    QTextDocument::FindFlags flag;
+//    flag = ((cs == Qt::CaseSensitive)? QTextDocument::FindCaseSensitively : flag);
 
-    if(!find(str, flag))
-    {
-        QMessageBox::warning(this, tr("查找失败"),
-                             tr("没有查找到: %1 .").arg(str), QMessageBox::Ok,
-                             QMessageBox::NoButton);
-    }
+//    if(!find(str, flag))
+//    {
+//        QMessageBox::warning(this, tr("查找失败"),
+//                             tr("没有查找到: %1 .").arg(str), QMessageBox::Ok,
+//                             QMessageBox::NoButton);
+//    }
 }
 
 void TextEditor::findPrevious(const QString &str, Qt::CaseSensitivity cs)
 {
-    QTextDocument::FindFlags flag = QTextDocument::FindBackward;
+//    QTextDocument::FindFlags flag = QTextDocument::FindBackward;
 
-    if(cs == Qt::CaseSensitive)
-    {
-        flag = flag | QTextDocument::FindCaseSensitively;
-    }
+//    if(cs == Qt::CaseSensitive)
+//    {
+//        flag = flag | QTextDocument::FindCaseSensitively;
+//    }
 
-    if(!find(str, flag))
-    {
-        QMessageBox::warning(this, tr("查找失败"),
-                             tr("没有查找到%1.").arg(str), QMessageBox::Ok,
-                             QMessageBox::NoButton);
-    }
+//    if(!find(str, flag))
+//    {
+//        QMessageBox::warning(this, tr("查找失败"),
+//                             tr("没有查找到%1.").arg(str), QMessageBox::Ok,
+//                             QMessageBox::NoButton);
+//    }
 }
 
 void TextEditor::signalTextModification(bool changed)
