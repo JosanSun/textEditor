@@ -1,4 +1,4 @@
 TEMPLATE = subdirs
 
-SUBDIRS += \
-    TextEditor
+SUBDIRS += TextEditor
+CONFIG += ordered

@@ -14,6 +14,7 @@ class QLabel;
 class QMenu;
 class QToolBar;
 class QTextEdit;
+class QTabWidget;
 class QCloseEvent;
 class FindDialog;
 class QPrinter;
@@ -89,7 +90,8 @@ private:
     QString shownName;           // 作为curFile的辅助，主要在curFile为空时，辅助shownName为new
     QStringList recentFiles;    // recentFiles文件名存储格式与curFile一致
     // 主编辑界面
-    TextEditor* textEdit      = nullptr;
+    TextEditor* m_pTextEdit      = nullptr;
+    QTabWidget* m_pTabWidget     = nullptr;
     // 查找对话框
     FindDialog* findDialog       = nullptr;
     MD5Widget* md5Widget         = nullptr;
