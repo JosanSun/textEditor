@@ -66,7 +66,8 @@ private slots:
     void setFullScreen();
     void updateApp();
     void onResultUpdate(QNetworkReply*);
-    void showCursorPosition();
+    void showCursorPosition(int line, int index);
+    void slotCopyAvailable(bool enabled);
 
 private:
     // 当前文件名

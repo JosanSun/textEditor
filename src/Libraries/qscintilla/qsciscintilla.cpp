@@ -4503,3 +4503,5 @@ bool QsciScintilla::scrollWidthTracking() const
 {
     return SendScintilla(SCI_GETSCROLLWIDTHTRACKING);
 }
+
+#include "moc_qsciscintilla.cpp"

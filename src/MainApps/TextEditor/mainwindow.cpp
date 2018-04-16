@@ -61,23 +61,18 @@ MainWindow::MainWindow(QWidget *parent)
 
 
 
-    connect(textEdit, &TextEditor::textChanged,
-            this, &MainWindow::textEditorModified);
-    connect(textEdit, &TextEditor::cursorPositionChanged,
-            this, &MainWindow::showCursorPosition);
-    connect(textEdit, &TextEditor::overwriteModeChanged,
-            [=]()
-            {
-               if(textEdit->overwriteMode())
-               {
-                   insertModeLabel->setText("OVR");
-               }
-               else
-               {
-                   insertModeLabel->setText("INS");
-               }
-            });
-
+    connect(textEdit, SIGNAL(textChanged()) , this, SLOT(textEditorModified()));
+    connect(textEdit, SIGNAL(cursorPositionChanged(int, int)), this, SLOT(showCursorPosition(int, int)));
+    connect(textEdit, &TextEditor::overwriteModeChanged, [=](){
+           if(textEdit->overwriteMode())
+           {
+               insertModeLabel->setText("OVR");
+           }
+           else
+           {
+               insertModeLabel->setText("INS");
+           }
+        });
 }
 
 MainWindow::~MainWindow()
@@ -177,14 +172,14 @@ bool MainWindow::saveAs()
 void MainWindow::printFile()
 {
 
-//    QPrinter printer(QPrinter::HighResolution);
-//    QPrintDialog *dlg = new QPrintDialog(&printer, this);
-//    if (textEdit->textCursor().hasSelection())
-//        dlg->addEnabledOption(QAbstractPrintDialog::PrintSelection);
-//    dlg->setWindowTitle(tr("打印文档"));
-//    if (dlg->exec() == QDialog::Accepted)
-//        textEdit->print(&printer);
-//    delete dlg;
+    QPrinter printer(QPrinter::HighResolution);
+    QPrintDialog *dlg = new QPrintDialog(&printer, this);
+    if (textEdit->hasSelectedText())
+        dlg->addEnabledOption(QAbstractPrintDialog::PrintSelection);
+    dlg->setWindowTitle(tr("打印文档"));
+    if (dlg->exec() == QDialog::Accepted)
+        textEdit->print(&printer);
+    delete dlg;
 
 //    // 部分系统可以简写为
 //    QPrinter printer(QPrinter::HighResolution);
@@ -404,7 +399,6 @@ void MainWindow::createActions()
     cutAction->setEnabled(false);
     connect(cutAction, &QAction::triggered,
             textEdit, &TextEditor::cut);
-    connect(textEdit, &TextEditor::copyAvailable, cutAction, &QAction::setEnabled);
 
     copyAction = new QAction(tr("复制(&C)"), this);
     copyAction->setIcon(QIcon(":/images/copy.png"));
@@ -414,7 +408,7 @@ void MainWindow::createActions()
     copyAction->setEnabled(false);
     connect(copyAction, &QAction::triggered,
             textEdit, &TextEditor::copy);
-    connect(textEdit, &TextEditor::copyAvailable, copyAction, &QAction::setEnabled);
+    connect(textEdit, SIGNAL(copyAvailable(bool)), this, SLOT(slotCopyAvailable(bool)));
 
     pasteAction = new QAction(tr("粘贴(&P)"), this);
     pasteAction->setIcon(QIcon(":/images/paste.png"));
@@ -443,7 +437,6 @@ void MainWindow::createActions()
                                                  Qt::Key_Delete, Qt::NoModifier);
                 QCoreApplication::postEvent(textEdit, event);
             });
-    connect(textEdit, &TextEditor::copyAvailable, deleteAction, &QAction::setEnabled);
 
     selectAllAction = new QAction(tr("全选(&L)"), this);
     selectAllAction->setShortcut(QKeySequence::SelectAll);
@@ -879,11 +872,16 @@ void MainWindow::onResultUpdate(QNetworkReply* /* reply */)
 }
 
 // 显示当前光标所在的行列号
-void MainWindow::showCursorPosition()
+void MainWindow::showCursorPosition(int line, int index)
 {
-//    int row = textEdit->textCursor().blockNumber() + 1;
-//    int col = textEdit->textCursor().columnNumber() + 1;
-//    rowColumnLabel->setText(tr("Ln : %1   Col : %2").arg(row).arg(col));
+    rowColumnLabel->setText(tr("Ln : %1   Col : %2").arg(line + 1).arg(index));
+}
+
+void MainWindow::slotCopyAvailable(bool enabled)
+{
+    cutAction->setEnabled(enabled);
+    copyAction->setEnabled(enabled);
+    deleteAction->setEnabled(enabled);
 }
 
 

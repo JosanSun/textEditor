@@ -6,6 +6,7 @@
 #include <QTextCodec>
 #include <QTime>
 #include <QMimeData>
+#include <QDebug>
 
 #include "my_plug-in/myheaders.h"
 #include "texteditor.h"
@@ -13,7 +14,6 @@
 TextEditor::TextEditor(QWidget* parent): QsciScintilla(parent)
 {
     clear();
-
 
     // 打开一个一行约有500KB字节的文件，所需的时间对比  测试文件在：testFile/longline.txt
     // QTextOption::WrapAtWordBoundaryOrAnywhere 是默认格式        // 40s
