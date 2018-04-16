@@ -14,8 +14,9 @@ MD5FileWidget::MD5FileWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    // 去除最大最小化按钮
-    setWindowFlags(windowFlags() & ~Qt::WindowMinMaxButtonsHint);
+//    // 去除最大最小化按钮
+//    setWindowFlags(windowFlags() & ~Qt::WindowMinMaxButtonsHint);
+    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
     setFixedSize(542, 375);
     this->setWindowTitle(tr("从文件生成MD5值"));
 
