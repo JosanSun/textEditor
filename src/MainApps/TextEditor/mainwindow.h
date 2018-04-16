@@ -77,12 +77,11 @@ private slots:
     void updateApp();
     void onResultUpdate(QNetworkReply*);
 
-    void showCursorPosition(int line, int index);
     void slotCopyAvailable(bool enabled);
     // 显示大小和总行数的状态栏
     void showSizeLines();
     // 更新当前光标所在的行列号
-    void showCursorPosition();
+    void showCursorPosition(int line, int index);
 
 private:
     // 当前文件名

@@ -4,6 +4,11 @@
 #include <QTextEdit>
 #include <Qsci/qsciscintilla.h>
 
+enum EndOfLineText
+{
+    Default1, Windows1, Unix1, Mac1
+};
+
 class TextEditor : public QsciScintilla
 {
     Q_OBJECT
@@ -12,10 +17,6 @@ signals:
     void modificationChanged(bool changed);
 
 public:
-	enum EndOfLineText
-	{
-		Default1, Windows1, Unix1, Mac1
-	};
 
     TextEditor(QWidget* parent = nullptr);
     bool readFile(const QString& fileName);

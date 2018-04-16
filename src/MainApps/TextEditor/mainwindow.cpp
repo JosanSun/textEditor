@@ -177,14 +177,14 @@ bool MainWindow::saveAs()
 void MainWindow::printFile()
 {
 
-    QPrinter printer(QPrinter::HighResolution);
-    QPrintDialog *dlg = new QPrintDialog(&printer, this);
-    if (textEdit->hasSelectedText())
-        dlg->addEnabledOption(QAbstractPrintDialog::PrintSelection);
-    dlg->setWindowTitle(tr("打印文档"));
-    if (dlg->exec() == QDialog::Accepted)
-        textEdit->print(&printer);
-    delete dlg;
+//    QPrinter printer(QPrinter::HighResolution);
+//    QPrintDialog *dlg = new QPrintDialog(&printer, this);
+//    if (textEdit->hasSelectedText())
+//        dlg->addEnabledOption(QAbstractPrintDialog::PrintSelection);
+//    dlg->setWindowTitle(tr("打印文档"));
+//    if (dlg->exec() == QDialog::Accepted)
+//        textEdit->print(&printer);
+//    delete dlg;
 
 //    // 部分系统可以简写为
 //    QPrinter printer(QPrinter::HighResolution);
@@ -251,7 +251,7 @@ void MainWindow::setFullScreen()
 void MainWindow::changeAutoLine()
 {
     isAutoLine = autoLineAction->isChecked();
-    textEdit->setLineWrapMode(isAutoLine ? QTextEdit::WidgetWidth : QTextEdit::NoWrap);
+//    textEdit->setLineWrapMode(isAutoLine ? QTextEdit::WidgetWidth : QTextEdit::NoWrap);
 
     QSettings settings(QCoreApplication::organizationName(),
                        QCoreApplication::applicationName());
@@ -608,9 +608,10 @@ void MainWindow::createStatusBar()
     // showLabel->setMargin(2); // 设定边距
     showLabel->setIndent(50);   // 设定间距
 
-    sizeLinesLabel = new QLabel(tr("length : %1  lines : %2")
-                                  .arg(textEdit->document()->characterCount() - 1)
-                                  .arg(textEdit->document()->lineCount()));
+    sizeLinesLabel = new QLabel(tr("length : %1  lines : %2"));
+//    sizeLinesLabel = new QLabel(tr("length : %1  lines : %2")
+//                                  .arg(textEdit->document()->characterCount() - 1)
+//                                  .arg(textEdit->document()->lineCount()));
     sizeLinesLabel->setAlignment(Qt::AlignLeft);
     sizeLinesLabel->setMinimumSize(sizeLinesLabel->sizeHint());
 
@@ -946,9 +947,9 @@ void MainWindow::onResultUpdate(QNetworkReply* /* reply */)
 // 显示当前文档的字符总数以及总行数  NOTE: 注意这里的中文字符按一个字符来算
 void MainWindow::showSizeLines()
 {
-    sizeLinesLabel->setText(tr("length : %1  lines : %2")
-                            .arg(textEdit->document()->characterCount() - 1)
-                            .arg(textEdit->document()->lineCount()));
+//    sizeLinesLabel->setText(tr("length : %1  lines : %2")
+//                            .arg(textEdit->document()->characterCount() - 1)
+//                            .arg(textEdit->document()->lineCount()));
 }
 
 // 显示当前光标所在的行列号
@@ -998,7 +999,7 @@ void MainWindow::updateEndOfLineModeLabel()
 void MainWindow::updateActions()
 {
     autoLineAction->setChecked(isAutoLine);
-    textEdit->setLineWrapMode(isAutoLine ? QTextEdit::WidgetWidth : QTextEdit::NoWrap);
+//    textEdit->setLineWrapMode(isAutoLine ? QTextEdit::WidgetWidth : QTextEdit::NoWrap);
 }
 
 
